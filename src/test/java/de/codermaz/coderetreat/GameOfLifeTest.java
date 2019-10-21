@@ -26,26 +26,12 @@ public class GameOfLifeTest
 
 	private int numberOfFieldsOfInitialBoard()
 	{
-		int[][] board = prepareSampleBoard9x9();
+		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
 
-		return readNumberOfFiledsOfInitialBoard( board );
+		Board board = new Board( sampleBoard9x9 );
+		return board.readNumberOfFiledsOfInitialBoard( );
 	}
 
-	private int readNumberOfFiledsOfInitialBoard(int[][] board)
-	{
-		int numberOfFields = 0;
-		int rowsNumber = board.length;
-
-		for( int[] row : board )
-		{
-			// check: column numbers are equal to row numbers
-			if( row.length != rowsNumber )
-				return -1;
-			numberOfFields += row.length;
-		}
-
-		return numberOfFields;
-	}
 
 	private int[][] prepareSampleBoard9x9()
 	{
