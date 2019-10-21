@@ -26,17 +26,13 @@ public class GameOfLifeTest
 
 	private int numberOfFieldsOfInitialBoard()
 	{
-		int[][] board = { //
-			{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
-			{ 1, 0, 1, 1, 1, 0, 0, 1, 0 }, //
-			{ 0, 1, 0, 0, 1, 1, 1, 1, 0 }, //
-			{ 1, 0, 0, 1, 1, 0, 0, 1, 1 }, //
-			{ 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //
-			{ 0, 1, 1, 1, 1, 0, 0, 1, 0 }, //
-			{ 0, 0, 0, 0, 1, 1, 1, 1, 1 }, //
-			{ 0, 1, 0, 1, 1, 1, 0, 1, 0 }, //
-			{ 0, 1, 1, 0, 0, 1, 1, 1, 0 } };
+		int[][] board = prepareSampleBoard9x9();
 
+		return readNumberOfFiledsOfInitialBoard( board );
+	}
+
+	private int readNumberOfFiledsOfInitialBoard(int[][] board)
+	{
 		int numberOfFields = 0;
 		int rowsNumber = board.length;
 
@@ -49,6 +45,20 @@ public class GameOfLifeTest
 		}
 
 		return numberOfFields;
+	}
+
+	private int[][] prepareSampleBoard9x9()
+	{
+		return new int[][] { //
+				{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
+				{ 1, 0, 1, 1, 1, 0, 0, 1, 0 }, //
+				{ 0, 1, 0, 0, 1, 1, 1, 1, 0 }, //
+				{ 1, 0, 0, 1, 1, 0, 0, 1, 1 }, //
+				{ 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //
+				{ 0, 1, 1, 1, 1, 0, 0, 1, 0 }, //
+				{ 0, 0, 0, 0, 1, 1, 1, 1, 1 }, //
+				{ 0, 1, 0, 1, 1, 1, 0, 1, 0 }, //
+				{ 0, 1, 1, 0, 0, 1, 1, 1, 0 } };
 	}
 
 }
