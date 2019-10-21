@@ -21,13 +21,34 @@ public class GameOfLifeTest
 
 	@Test public void testNumberOfFieldsOfInitialBoard()
 	{
-
 		Assert.assertThat( numberOfFieldsOfInitialBoard(), IsEqual.equalTo( 81 ) );
 	}
 
 	private int numberOfFieldsOfInitialBoard()
 	{
-		return 0;
+		int[][] board = { //
+			{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
+			{ 1, 0, 1, 1, 1, 0, 0, 1, 0 }, //
+			{ 0, 1, 0, 0, 1, 1, 1, 1, 0 }, //
+			{ 1, 0, 0, 1, 1, 0, 0, 1, 1 }, //
+			{ 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //
+			{ 0, 1, 1, 1, 1, 0, 0, 1, 0 }, //
+			{ 0, 0, 0, 0, 1, 1, 1, 1, 1 }, //
+			{ 0, 1, 0, 1, 1, 1, 0, 1, 0 }, //
+			{ 0, 1, 1, 0, 0, 1, 1, 1, 0 } };
+
+		int numberOfFields = 0;
+		int rowsNumber = board.length;
+
+		for( int[] row : board )
+		{
+			// check: column numbers are equal to row numbers
+			if( row.length != rowsNumber )
+				return -1;
+			numberOfFields+=row.length;
+		}
+
+		return numberOfFields;
 	}
 
 }
