@@ -41,7 +41,7 @@ public class GameOfLifeTest
 			// check: column numbers are equal to row numbers
 			if( row.length != rowsNumber )
 				return -1;
-			numberOfFields+=row.length;
+			numberOfFields += row.length;
 		}
 
 		return numberOfFields;
@@ -50,15 +50,15 @@ public class GameOfLifeTest
 	private int[][] prepareSampleBoard9x9()
 	{
 		return new int[][] { //
-				{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
-				{ 1, 0, 1, 1, 1, 0, 0, 1, 0 }, //
-				{ 0, 1, 0, 0, 1, 1, 1, 1, 0 }, //
-				{ 1, 0, 0, 1, 1, 0, 0, 1, 1 }, //
-				{ 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //
-				{ 0, 1, 1, 1, 1, 0, 0, 1, 0 }, //
-				{ 0, 0, 0, 0, 1, 1, 1, 1, 1 }, //
-				{ 0, 1, 0, 1, 1, 1, 0, 1, 0 }, //
-				{ 0, 1, 1, 0, 0, 1, 1, 1, 0 } };
+			{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
+			{ 1, 0, 1, 1, 1, 0, 0, 1, 0 }, //
+			{ 0, 1, 0, 0, 1, 1, 1, 1, 0 }, //
+			{ 1, 0, 0, 1, 1, 0, 0, 1, 1 }, //
+			{ 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //
+			{ 0, 1, 1, 1, 1, 0, 0, 1, 0 }, //
+			{ 0, 0, 0, 0, 1, 1, 1, 1, 1 }, //
+			{ 0, 1, 0, 1, 1, 1, 0, 1, 0 }, //
+			{ 0, 1, 1, 0, 0, 1, 1, 1, 0 } };
 	}
 
 }
