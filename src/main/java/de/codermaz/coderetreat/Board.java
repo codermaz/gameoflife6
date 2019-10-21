@@ -2,7 +2,9 @@ package de.codermaz.coderetreat;
 
 public class Board
 {
-	private final int[][] board;
+	public static final int     WRONG_BOARD_MATRIX = -1;
+	private final       int[][] board;
+	private             int     rowsNumber;
 
 	public Board(int[][] board)
 	{
@@ -12,17 +14,27 @@ public class Board
 	public int readNumberOfFiledsOfInitialBoard()
 	{
 		int numberOfFields = 0;
-		int rowsNumber = board.length;
+		rowsNumber = board.length;
 
 		for( int[] row : board )
 		{
 			// check: column numbers are equal to row numbers
 			if( row.length != rowsNumber )
-				return -1;
+				return WRONG_BOARD_MATRIX;
 			numberOfFields += row.length;
 		}
 
 		return numberOfFields;
+	}
+
+	public int[][] getBoard()
+	{
+		return board;
+	}
+
+	public int getRowsNumber()
+	{
+		return rowsNumber;
 	}
 
 }
