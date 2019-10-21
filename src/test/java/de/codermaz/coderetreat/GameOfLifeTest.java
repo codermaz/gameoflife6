@@ -1,5 +1,6 @@
 package de.codermaz.coderetreat;
 
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.IsEqual;
 import org.junit.After;
 import org.junit.Assert;
@@ -24,14 +25,21 @@ public class GameOfLifeTest
 		Assert.assertThat( numberOfFieldsOfInitialBoard(), IsEqual.equalTo( 81 ) );
 	}
 
+	@Test public void testNumberOfDeadAndAliveCellsOfBoard()
+	{
+		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
+
+		Assert.assertThat( numberOfAliveCells( sampleBoard9x9 ), CoreMatchers.equalTo( 45 ) );
+	}
+
+
 	private int numberOfFieldsOfInitialBoard()
 	{
 		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
 
 		Board board = new Board( sampleBoard9x9 );
-		return board.readNumberOfFiledsOfInitialBoard( );
+		return board.readNumberOfFiledsOfInitialBoard();
 	}
-
 
 	private int[][] prepareSampleBoard9x9()
 	{
