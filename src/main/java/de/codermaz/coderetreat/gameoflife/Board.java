@@ -1,14 +1,22 @@
 package de.codermaz.coderetreat.gameoflife;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+
 public class Board
 {
-	public static final int     WRONG_BOARD_MATRIX = -1;
-	private final       int[][] board;
-	private             int     rowsNumber;
+	private static final int         WRONG_BOARD_MATRIX = -1;
+	private final        int[][]     board;
+	private final        List<int[]> boardAsList;
+	private              int         rowsNumber;
 
 	public Board(int[][] board)
 	{
 		this.board = board;
+		boardAsList = Arrays.stream( this.board ).collect( Collectors.toList() );
 	}
 
 	public int readNumberOfCells()
@@ -41,6 +49,53 @@ public class Board
 			}
 		}
 		return aliveCells;
+	}
+
+	public int getNeighboursCount(int cellRow, int cellCol)
+	{
+		List<int[]> neighbourRows = readNeighbourRows( cellRow );
+		int neighboursWithOwnValue = readNeighboursInCol( neighbourRows, cellCol );
+		int neighboursCount = neighboursWithOwnValue - boardAsList.get( cellRow )[cellCol];
+
+		return neighboursCount;
+	}
+
+	private List<int[]> readNeighbourRows(int cellRow)
+	{
+		List<int[]> neighbourRows = new ArrayList<>();
+		neighbourRows.add( boardAsList.get( cellRow ) );
+
+		if( cellRow != 0 )
+		{
+			neighbourRows.add( boardAsList.get( cellRow - 1 ) );
+		}
+		if( cellRow != boardAsList.size() - 1 )
+		{
+			neighbourRows.add( boardAsList.get( cellRow + 1 ) );
+		}
+
+		return neighbourRows;
+	}
+
+	private int readNeighboursInCol(List<int[]> neighbourRows, int cellCol)
+	{
+		int colNumbers = boardAsList.get( 0 ).length;
+		int neighboursCount = 0;
+		for( int[] neighbourRow : neighbourRows )
+		{
+			neighboursCount += neighbourRow[cellCol];
+
+			if( cellCol != 0 )
+			{
+				neighboursCount += neighbourRow[cellCol - 1];
+			}
+			if( cellCol != colNumbers - 1 )
+			{
+				neighboursCount += neighbourRow[cellCol + 1];
+			}
+		}
+
+		return neighboursCount;
 	}
 
 	public int[][] getBoard()
