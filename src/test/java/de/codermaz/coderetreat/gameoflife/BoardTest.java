@@ -26,7 +26,7 @@ public class BoardTest
 		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
 	}
 
-	public int[][] prepareSampleBoard9x9()
+	int[][] prepareSampleBoard9x9()
 	{
 		return new int[][] { //
 			{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
