@@ -29,6 +29,13 @@ public class GameOfLifeTest
 	{
 		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
 
+		int numberOfAliveCells = getNumberOfAliveCells( sampleBoard9x9 );
+
+		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
+	}
+
+	private int getNumberOfAliveCells(int[][] sampleBoard9x9)
+	{
 		int numberOfAliveCells;
 		int[][] board = sampleBoard9x9;
 		int aliveCells = 0;
@@ -43,8 +50,7 @@ public class GameOfLifeTest
 			}
 		}
 		numberOfAliveCells = aliveCells;
-
-		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
+		return numberOfAliveCells;
 	}
 
 	private int numberOfFieldsOfInitialBoard()
