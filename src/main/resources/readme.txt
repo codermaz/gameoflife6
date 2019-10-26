@@ -15,14 +15,24 @@ klick on next >
 
 cell:
 	alive
-		lives
-			2<= neighbours <=3
-		dies
-			<2 neighbour
-			>3 neighbours
+		neighbours
+		    2 or 3
+		        lives
+		    <2 or >3
+		        dies
 	dead
-		lives
-			=3 neighbours
+		neighbours
+		    =3
+		        lives
+//
+cell:
+    neighbours
+        <2 or >3
+            dies
+        =2 and isAlive
+            lives
+        =3
+            lives
 
 write board (next generation)
 
