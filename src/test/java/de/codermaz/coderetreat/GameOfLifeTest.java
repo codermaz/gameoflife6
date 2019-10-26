@@ -28,30 +28,12 @@ public class GameOfLifeTest
 	@Test public void testNumberOfDeadAndAliveCellsOfBoard()
 	{
 		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
+		Board board = new Board( sampleBoard9x9 );
 
-		int numberOfAliveCells = getNumberOfAliveCells( sampleBoard9x9 );
-
+		int numberOfAliveCells = board.getNumberOfAliveCells( sampleBoard9x9 );
 		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
 	}
 
-	private int getNumberOfAliveCells(int[][] sampleBoard9x9)
-	{
-		int numberOfAliveCells;
-		int[][] board = sampleBoard9x9;
-		int aliveCells = 0;
-		for( int[] row : board )
-		{
-			for( int colInRow : row )
-			{
-				if( colInRow == 1 )
-				{
-					aliveCells++;
-				}
-			}
-		}
-		numberOfAliveCells = aliveCells;
-		return numberOfAliveCells;
-	}
 
 	private int numberOfFieldsOfInitialBoard()
 	{

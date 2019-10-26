@@ -27,6 +27,22 @@ public class Board
 		return numberOfFields;
 	}
 
+	public int getNumberOfAliveCells(int[][] board)
+	{
+		int aliveCells = 0;
+		for( int[] row : board )
+		{
+			for( int colInRow : row )
+			{
+				if( colInRow == 1 )
+				{
+					aliveCells++;
+				}
+			}
+		}
+		return aliveCells;
+	}
+
 	public int[][] getBoard()
 	{
 		return board;
