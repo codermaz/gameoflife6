@@ -9,12 +9,15 @@ import org.junit.Test;
 public class BoardTest
 {
 
-	@Test public void testNumberOfFieldsOfInitialBoard()
+	@Test public void testNumberOfCellsOfInitialBoard()
 	{
-		Assert.assertThat( numberOfFieldsOfInitialBoard(), IsEqual.equalTo( 81 ) );
+		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
+		Board board = new Board( sampleBoard9x9 );
+
+		Assert.assertThat( board.readNumberOfCells(), IsEqual.equalTo( 81 ) );
 	}
 
-	@Test public void testNumberOfDeadAndAliveCellsOfBoard()
+	@Test public void testNumberOfAliveCellsOfBoard()
 	{
 		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
 		Board board = new Board( sampleBoard9x9 );
@@ -23,15 +26,7 @@ public class BoardTest
 		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
 	}
 
-	private int numberOfFieldsOfInitialBoard()
-	{
-		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
-		Board board = new Board( sampleBoard9x9 );
-
-		return board.readNumberOfCells();
-	}
-
-	private int[][] prepareSampleBoard9x9()
+	public int[][] prepareSampleBoard9x9()
 	{
 		return new int[][] { //
 			{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
