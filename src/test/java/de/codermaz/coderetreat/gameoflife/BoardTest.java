@@ -11,7 +11,7 @@ public class BoardTest
 
 	@Test public void testNumberOfCellsOfInitialBoard()
 	{
-		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
+		int[][] sampleBoard9x9 = prepareManualSampleBoard9x9();
 		Board board = new Board( sampleBoard9x9 );
 
 		Assert.assertThat( board.readNumberOfCells(), IsEqual.equalTo( 81 ) );
@@ -19,14 +19,14 @@ public class BoardTest
 
 	@Test public void testNumberOfAliveCellsOfBoard()
 	{
-		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
+		int[][] sampleBoard9x9 = prepareManualSampleBoard9x9();
 		Board board = new Board( sampleBoard9x9 );
 
 		int numberOfAliveCells = board.getNumberOfAliveCells( sampleBoard9x9 );
 		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
 	}
 
-	int[][] prepareSampleBoard9x9()
+	int[][] prepareManualSampleBoard9x9()
 	{
 		return new int[][] { //
 			{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
