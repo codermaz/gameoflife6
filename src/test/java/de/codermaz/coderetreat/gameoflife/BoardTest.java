@@ -1,24 +1,13 @@
-package de.codermaz.coderetreat;
+package de.codermaz.coderetreat.gameoflife;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.IsEqual;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 
-public class GameOfLifeTest
+public class BoardTest
 {
-
-	@Before public void setUp() throws Exception
-	{
-
-	}
-
-	@After public void tearDown() throws Exception
-	{
-	}
 
 	@Test public void testNumberOfFieldsOfInitialBoard()
 	{
@@ -34,13 +23,12 @@ public class GameOfLifeTest
 		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
 	}
 
-
 	private int numberOfFieldsOfInitialBoard()
 	{
 		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
 		Board board = new Board( sampleBoard9x9 );
 
-		return board.readNumberOfFiledsOfInitialBoard();
+		return board.readNumberOfCells();
 	}
 
 	private int[][] prepareSampleBoard9x9()

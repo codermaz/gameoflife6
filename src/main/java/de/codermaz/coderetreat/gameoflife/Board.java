@@ -1,4 +1,4 @@
-package de.codermaz.coderetreat;
+package de.codermaz.coderetreat.gameoflife;
 
 public class Board
 {
@@ -11,9 +11,9 @@ public class Board
 		this.board = board;
 	}
 
-	public int readNumberOfFiledsOfInitialBoard()
+	public int readNumberOfCells()
 	{
-		int numberOfFields = 0;
+		int numberOfCells = 0;
 		rowsNumber = board.length;
 
 		for( int[] row : board )
@@ -21,10 +21,10 @@ public class Board
 			// check: column numbers are equal to row numbers
 			if( row.length != rowsNumber )
 				return WRONG_BOARD_MATRIX;
-			numberOfFields += row.length;
+			numberOfCells += row.length;
 		}
 
-		return numberOfFields;
+		return numberOfCells;
 	}
 
 	public int getNumberOfAliveCells(int[][] board)
@@ -32,9 +32,9 @@ public class Board
 		int aliveCells = 0;
 		for( int[] row : board )
 		{
-			for( int colInRow : row )
+			for( int cell : row )
 			{
-				if( colInRow == 1 )
+				if( cell == 1 )
 				{
 					aliveCells++;
 				}
