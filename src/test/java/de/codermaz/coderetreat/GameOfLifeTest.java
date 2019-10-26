@@ -29,7 +29,21 @@ public class GameOfLifeTest
 	{
 		int[][] sampleBoard9x9 = prepareSampleBoard9x9();
 
-		int numberOfAliveCells = 0;
+		int numberOfAliveCells;
+		int[][] board = sampleBoard9x9;
+		int aliveCells = 0;
+		for( int[] row : board )
+		{
+			for( int colInRow : row )
+			{
+				if( colInRow == 1 )
+				{
+					aliveCells++;
+				}
+			}
+		}
+		numberOfAliveCells = aliveCells;
+
 		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
 	}
 
