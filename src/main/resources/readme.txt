@@ -8,7 +8,6 @@ Any live cell with more than three live neighbours dies, as if by overcrowding.
 
 Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 --------------------------
-
 read intial board
 
 klick on next >
@@ -16,23 +15,23 @@ klick on next >
 cell:
 	alive
 		neighbours
-		    2 or 3
-		        lives
-		    <2 or >3
-		        dies
+        2 or 3
+            lives
+        <2 or >3
+            dies
 	dead
 		neighbours
-		    =3
-		        lives
+        =3
+            lives
 //
 cell:
     neighbours
-        <2 or >3
-            dies
-        =2 and isAlive
-            lives
-        =3
-            lives
+    <2 or >3
+        dies
+    =2 and isAlive
+        lives
+    =3
+        lives
 
 write board (next generation)
 
