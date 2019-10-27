@@ -10,12 +10,12 @@ public class BoardTest
 {
 	private int[][] sampleBoard9x9 = new int[][] { //
 		{ 0, 0, 0, 1, 1, 1, 0, 1, 1 }, //
-		{ 1, 0, 1, 1, 1, 0, 0, 1, 0 }, //
+		{ 1, 0, 0, 1, 1, 0, 0, 1, 0 }, //
 		{ 0, 1, 0, 0, 1, 1, 1, 1, 0 }, //
 		{ 1, 0, 0, 1, 1, 0, 0, 1, 1 }, //
 		{ 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //
-		{ 0, 1, 1, 1, 1, 0, 0, 1, 0 }, //
-		{ 0, 0, 0, 0, 1, 1, 1, 1, 1 }, //
+		{ 0, 1, 1, 1, 1, 0, 0, 1, 1 }, //
+		{ 1, 0, 0, 0, 1, 1, 1, 1, 1 }, //
 		{ 0, 1, 0, 1, 1, 1, 0, 1, 0 }, //
 		{ 0, 1, 1, 0, 0, 1, 1, 1, 0 } };
 
@@ -31,7 +31,7 @@ public class BoardTest
 		Board board = new Board( sampleBoard9x9 );
 
 		int numberOfAliveCells = board.getNumberOfAliveCells( sampleBoard9x9 );
-		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 45 ) );
+		Assert.assertThat( numberOfAliveCells, CoreMatchers.equalTo( 46 ) );
 	}
 
 	@Test public void testNeighboursCount()
@@ -52,6 +52,65 @@ public class BoardTest
 				"testNeighboursCount for [cellRow = " + cellRow + ", cellCol = " + cellCol + ", neighboursCount = " + neighboursCount + "]" );
 			Assert.assertThat( "number of neighbours is wrong", board.getNeighboursCount( cellRow, cellCol ),
 				CoreMatchers.equalTo( neighboursCount ) );
+		}
+	}
+
+	@Test public void testCellDiesIfLessThan2orMoreThan3Neighbours()
+	{
+
+		Board board = new Board( sampleBoard9x9 );
+
+		int cellRow = 1;
+		int cellCol = 0;
+
+		nextGeneration( board, cellRow, cellCol );
+
+		int isCellAlive = sampleBoard9x9[cellRow][cellCol];
+
+		Assert.assertThat( isCellAlive, CoreMatchers.equalTo( 0 ) );
+
+	}
+
+	@Test public void testCellLivesIf2NeighboursAndCellIsAlive()
+	{
+		Board board = new Board( sampleBoard9x9 );
+
+		int cellRow = 6;
+		int cellCol = 0;
+
+		nextGeneration( board, cellRow, cellCol );
+		int isCellAlive = sampleBoard9x9[cellRow][cellCol];
+
+		Assert.assertThat( isCellAlive, CoreMatchers.equalTo( 1 ) );
+	}
+
+	@Test public void testCellLivesIf3Neighbours()
+	{
+		Board board = new Board( sampleBoard9x9 );
+
+		int cellRow = 1;
+		int cellCol = 2;
+
+		nextGeneration( board, cellRow, cellCol );
+		int isCellAlive = sampleBoard9x9[cellRow][cellCol];
+
+		Assert.assertThat( isCellAlive, CoreMatchers.equalTo( 1 ) );
+	}
+
+	private void nextGeneration(Board board, int cellRow, int cellCol)
+	{
+		int neighboursCount = board.getNeighboursCount( cellRow, cellCol );
+		if( neighboursCount < 2 || neighboursCount > 3 )
+		{
+			sampleBoard9x9[cellRow][cellCol] = 0;
+		}
+		else if( neighboursCount == 2 && sampleBoard9x9[cellRow][cellCol] == 1 )
+		{
+			sampleBoard9x9[cellRow][cellCol] = 1;
+		}
+		else if( neighboursCount == 3 )
+		{
+			sampleBoard9x9[cellRow][cellCol] = 1;
 		}
 	}
 
