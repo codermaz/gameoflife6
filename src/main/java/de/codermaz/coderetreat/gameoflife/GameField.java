@@ -6,20 +6,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class Board
+public class GameField
 {
-	private static final int         WRONG_BOARD_MATRIX = -1;
+	private static final int         NOT_SQUARE_BOARD = -1;
 	private final        int[][]     board;
 	private final        List<int[]> boardAsList;
 	private              int         rowsNumber;
 
-	public Board(int[][] board)
+	public GameField(int[][] board)
 	{
 		this.board = board;
 		boardAsList = Arrays.stream( this.board ).collect( Collectors.toList() );
 	}
 
-	public int readNumberOfCells()
+	public int getNumberOfCells()
 	{
 		int numberOfCells = 0;
 		rowsNumber = board.length;
@@ -28,7 +28,7 @@ public class Board
 		{
 			// check: column numbers are equal to row numbers
 			if( row.length != rowsNumber )
-				return WRONG_BOARD_MATRIX;
+				return NOT_SQUARE_BOARD;
 			numberOfCells += row.length;
 		}
 

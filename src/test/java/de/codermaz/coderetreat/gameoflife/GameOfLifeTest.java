@@ -7,11 +7,11 @@ import org.junit.Before;
 public class GameOfLifeTest
 {
 
-	private BoardTest boardTest;
+	private GameFieldTest boardTest;
 
 	@Before public void setUp()
 	{
-		boardTest = new BoardTest();
+		boardTest = new GameFieldTest();
 	}
 
 	@After public void tearDown()
