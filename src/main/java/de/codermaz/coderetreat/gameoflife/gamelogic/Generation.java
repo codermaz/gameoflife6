@@ -1,4 +1,4 @@
-package de.codermaz.coderetreat.gameoflife;
+package de.codermaz.coderetreat.gameoflife.gamelogic;
 
 public class Generation
 {

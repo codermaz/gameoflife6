@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1200.0"
+      prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171"
+      fx:controller="de.codermaz.coderetreat.gameoflife.gui.GameOfLifePresenter">
+    <children>
+        <MenuBar VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="New"/>
+                        <MenuItem mnemonicParsing="false" text="Open…"/>
+                        <Menu mnemonicParsing="false" text="Open Recent"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" text="Close"/>
+                        <MenuItem mnemonicParsing="false" text="Save"/>
+                        <MenuItem mnemonicParsing="false" text="Save As…"/>
+                        <MenuItem mnemonicParsing="false" text="Revert"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" text="Preferences…"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" text="Quit"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Undo"/>
+                        <MenuItem mnemonicParsing="false" text="Redo"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" text="Cut"/>
+                        <MenuItem mnemonicParsing="false" text="Copy"/>
+                        <MenuItem mnemonicParsing="false" text="Paste"/>
+                        <MenuItem mnemonicParsing="false" text="Delete"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" text="Select All"/>
+                        <MenuItem mnemonicParsing="false" text="Unselect All"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About MyHelloApp"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <SplitPane dividerPositions="0.2505567928730512, 0.5" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0"
+                   VBox.vgrow="ALWAYS">
+            <items>
+                <AnchorPane maxWidth="170.0" minWidth="170.0" prefHeight="744.0" prefWidth="170.0" SplitPane.resizableWithParent="false">
+                    <children>
+                        <AnchorPane layoutX="-7.0" layoutY="53.0" prefHeight="93.0" prefWidth="150.0" AnchorPane.leftAnchor="0.0"
+                                    AnchorPane.rightAnchor="0.0">
+                            <children>
+                                <Button fx:id="resetFieldButton" layoutY="30.0" mnemonicParsing="false" onAction="#resetFieldButtonPressed"
+                                        prefWidth="129.0" text="Reset Field" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </padding>
+                                </Button>
+                            </children>
+                        </AnchorPane>
+                        <Label alignment="CENTER" layoutY="14.0" prefWidth="-1.0" style="&#10;" text="Game Control" textAlignment="CENTER"
+                               textFill="#100000" wrapText="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                               AnchorPane.topAnchor="14.0">
+                            <font>
+                                <Font size="18.0" fx:id="x1"/>
+                            </font>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </padding>
+                            <effect>
+                                <Glow/>
+                            </effect>
+                        </Label>
+                        <AnchorPane layoutY="118.0" prefHeight="93.0" prefWidth="150.0" AnchorPane.leftAnchor="0.0"
+                                    AnchorPane.rightAnchor="0.0">
+                            <children>
+                                <Button fx:id="nextGenerationButton" layoutY="31.0" mnemonicParsing="false"
+                                        onAction="#nextGenerationButtonPressed" prefWidth="129.0" text="Next Generation"
+                                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </padding>
+                                </Button>
+                                <Separator layoutX="-16.0" layoutY="13.0" prefWidth="200.0">
+                                    <effect>
+                                        <DropShadow/>
+                                    </effect>
+                                </Separator>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane layoutX="31.0" layoutY="201.0" prefHeight="462.0" prefWidth="170.0" AnchorPane.leftAnchor="0.0"
+                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="201.0">
+                            <children>
+                                <Slider fx:id="secondsSlider" blockIncrement="1.0" layoutX="-19.0" layoutY="-14.0" majorTickUnit="1.0"
+                                        max="10.0" min="1.0" minorTickCount="0" orientation="VERTICAL" prefHeight="318.0" prefWidth="19.0"
+                                        showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0"
+                                        AnchorPane.bottomAnchor="144.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                        AnchorPane.topAnchor="0.0"/>
+                                <Button fx:id="showNextInIntervalButton" layoutY="349.0" mnemonicParsing="false"
+                                        onAction="#showNextGenerationInIntervalButtonPressed" prefWidth="170.0" text="Show Next Generation"
+                                        textAlignment="JUSTIFY" textOverrun="CLIP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </padding>
+                                </Button>
+                                <Label fx:id="inSecondsLabel" layoutY="318.0" text="in 3 secs automatically" textAlignment="CENTER"
+                                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Button fx:id="stopGenrationButton" layoutY="390.0" mnemonicParsing="false"
+                                        onAction="#stopGenrationButtonPressed" prefWidth="170.0" text="Stop Generation">
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </padding>
+                                </Button>
+                            </children>
+                        </AnchorPane>
+                        <Separator layoutX="-25.0" layoutY="64.0" prefWidth="200.0">
+                            <effect>
+                                <DropShadow/>
+                            </effect>
+                        </Separator>
+                        <Button fx:id="exitButton" layoutX="53.0" layoutY="713.0" mnemonicParsing="false" text="EXIT"
+                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
+                        <Separator layoutX="-18.0" layoutY="198.0" prefWidth="200.0">
+                            <effect>
+                                <DropShadow/>
+                            </effect>
+                        </Separator>
+                        <Separator layoutX="-15.0" layoutY="633.0" prefHeight="10.0" prefWidth="200.0">
+                            <effect>
+                                <DropShadow/>
+                            </effect>
+                        </Separator>
+                    </children>
+                </AnchorPane>
+                <AnchorPane id="Content" prefHeight="600.0" prefWidth="1200.0">
+                    <children>
+                        <GridPane fx:id="boardGrid" alignment="CENTER" gridLinesVisible="true" layoutX="7.0" minWidth="744.0"
+                                  nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="7.0"
+                                  AnchorPane.rightAnchor="-7.0" AnchorPane.topAnchor="0.0">
+
+                            <cursor>
+                                <Cursor fx:constant="CROSSHAIR"/>
+                            </cursor>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN"/>
+                            </effect>
+                        </GridPane>
+                    </children>
+                </AnchorPane>
+                <AnchorPane minWidth="200.0">
+                    <children>
+                        <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="Stats" textAlignment="CENTER"
+                               wrapText="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
+                            <effect>
+                                <Glow/>
+                            </effect>
+                        </Label>
+                        <Label layoutX="38.0" layoutY="98.0" prefHeight="31.0" prefWidth="84.0" text="Years gone"
+                               AnchorPane.leftAnchor="38.0">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </padding>
+                        </Label>
+                        <Label fx:id="yearsGoneCountLabel" layoutX="122.0" layoutY="98.0" text="0" textAlignment="JUSTIFY"
+                               textFill="#3a0ebf" AnchorPane.rightAnchor="102.0">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </padding>
+                            <cursor>
+                                <Cursor fx:constant="NONE"/>
+                            </cursor>
+                        </Label>
+                        <BarChart fx:id="aliveCellsBarChart" layoutY="190.0" prefHeight="400.0" prefWidth="154.0" title="Alive Cells"
+                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                            <xAxis>
+                                <CategoryAxis label="YearsGone" side="BOTTOM"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT"/>
+                            </yAxis>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </padding>
+                        </BarChart>
+                        <Separator layoutX="22.0" layoutY="65.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                            <effect>
+                                <DropShadow/>
+                            </effect>
+                        </Separator>
+                        <Label layoutX="38.0" layoutY="146.0" prefHeight="31.0" prefWidth="84.0" text="Alive Cells">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </padding>
+                        </Label>
+                        <Label fx:id="aliveCellsCountLabel" layoutX="147.0" layoutY="146.0" text="0" textAlignment="JUSTIFY"
+                               textFill="#3a0ebf">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </padding>
+                            <cursor>
+                                <Cursor fx:constant="NONE"/>
+                            </cursor>
+                        </Label>
+                    </children>
+                    <opaqueInsets>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </opaqueInsets>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
+            <children>
+                <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">
+                    <font>
+                        <Font size="11.0" fx:id="x3"/>
+                    </font>
+                    <textFill>
+                        <Color fx:id="statusTextColor" blue="0.625" green="0.625" red="0.625"/>
+                    </textFill>
+                </Label>
+                <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS"/>
+                <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$statusTextColor" HBox.hgrow="NEVER"/>
+            </children>
+            <padding>
+                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+            </padding>
+        </HBox>
+    </children>
+</VBox>

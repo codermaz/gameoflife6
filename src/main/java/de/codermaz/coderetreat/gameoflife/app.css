@@ -1,0 +1,13 @@
+.gridpane {
+
+}
+
+.gridpane .label {
+    -fx-font: 24px "Helvetica";
+    -fx-text-fill: white;
+    -fx-border-color: white;
+}
+
+.button {
+    -fx-pref-height: 48px;
+}

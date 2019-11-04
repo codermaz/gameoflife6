@@ -1,5 +1,8 @@
 package de.codermaz.coderetreat.gameoflife;
 
+import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
+import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
+import de.codermaz.coderetreat.gameoflife.gamelogic.Samples;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;

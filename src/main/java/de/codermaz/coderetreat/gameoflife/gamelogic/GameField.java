@@ -1,4 +1,4 @@
-package de.codermaz.coderetreat.gameoflife;
+package de.codermaz.coderetreat.gameoflife.gamelogic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
