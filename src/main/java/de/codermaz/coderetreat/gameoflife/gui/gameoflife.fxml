@@ -11,7 +11,8 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1200.0"
-      prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171"
+      prefHeight="800.0"
+      prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171"
       fx:controller="de.codermaz.coderetreat.gameoflife.gui.GameOfLifePresenter">
     <children>
         <MenuBar VBox.vgrow="NEVER">
@@ -61,8 +62,14 @@
                         <AnchorPane layoutX="-7.0" layoutY="53.0" prefHeight="93.0" prefWidth="150.0" AnchorPane.leftAnchor="0.0"
                                     AnchorPane.rightAnchor="0.0">
                             <children>
-                                <Button fx:id="resetFieldButton" layoutY="30.0" mnemonicParsing="false" onAction="#resetFieldButtonPressed"
+                                <Button fx:id="resetFieldButton" layoutY="22.0" mnemonicParsing="false" onAction="#resetFieldButtonPressed"
                                         prefWidth="129.0" text="Reset Field" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </padding>
+                                </Button>
+                                <Button fx:id="emptyFieldButton" layoutY="74.0" mnemonicParsing="false" onAction="#emptyFieldButtonPressed"
+                                        prefWidth="129.0" text="Empty Field" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                     <padding>
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                     </padding>
@@ -82,7 +89,7 @@
                                 <Glow/>
                             </effect>
                         </Label>
-                        <AnchorPane layoutY="118.0" prefHeight="93.0" prefWidth="150.0" AnchorPane.leftAnchor="0.0"
+                        <AnchorPane layoutY="159.0" prefHeight="93.0" prefWidth="150.0" AnchorPane.leftAnchor="0.0"
                                     AnchorPane.rightAnchor="0.0">
                             <children>
                                 <Button fx:id="nextGenerationButton" layoutY="31.0" mnemonicParsing="false"
@@ -92,19 +99,19 @@
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                     </padding>
                                 </Button>
-                                <Separator layoutX="-16.0" layoutY="13.0" prefWidth="200.0">
+                                <Separator layoutX="-16.0" layoutY="24.0" prefWidth="200.0">
                                     <effect>
                                         <DropShadow/>
                                     </effect>
                                 </Separator>
                             </children>
                         </AnchorPane>
-                        <AnchorPane layoutX="31.0" layoutY="201.0" prefHeight="462.0" prefWidth="170.0" AnchorPane.leftAnchor="0.0"
-                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="201.0">
+                        <AnchorPane layoutX="-3.0" layoutY="251.0" prefHeight="462.0" prefWidth="170.0" AnchorPane.leftAnchor="0.0"
+                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="251.0">
                             <children>
-                                <Slider fx:id="secondsSlider" blockIncrement="1.0" layoutX="-19.0" layoutY="-14.0" majorTickUnit="1.0"
-                                        max="10.0" min="1.0" minorTickCount="0" orientation="VERTICAL" prefHeight="318.0" prefWidth="19.0"
-                                        showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0"
+                                <Slider fx:id="secondsSlider" blockIncrement="500.0" layoutX="-19.0" layoutY="-14.0" majorTickUnit="200.0"
+                                        max="3000.0" minorTickCount="0" orientation="VERTICAL" prefHeight="318.0" prefWidth="19.0"
+                                        showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1000.0"
                                         AnchorPane.bottomAnchor="144.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                         AnchorPane.topAnchor="0.0"/>
                                 <Button fx:id="showNextInIntervalButton" layoutY="349.0" mnemonicParsing="false"
@@ -114,14 +121,15 @@
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                     </padding>
                                 </Button>
-                                <Label fx:id="inSecondsLabel" layoutY="318.0" text="in 3 secs automatically" textAlignment="CENTER"
+                                <Label fx:id="inSecondsLabel" layoutY="318.0" text="in ? millis automatically" textAlignment="CENTER"
                                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                     <padding>
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                     </padding>
                                 </Label>
-                                <Button fx:id="stopGenrationButton" layoutY="390.0" mnemonicParsing="false"
-                                        onAction="#stopGenrationButtonPressed" prefWidth="170.0" text="Stop Generation">
+                                <Button fx:id="stopGenrationButton" layoutY="395.0" mnemonicParsing="false"
+                                        onAction="#stopGenerationButtonPressed" prefWidth="170.0" text="Stop Generation"
+                                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                     <padding>
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                     </padding>
@@ -135,12 +143,12 @@
                         </Separator>
                         <Button fx:id="exitButton" layoutX="53.0" layoutY="713.0" mnemonicParsing="false" text="EXIT"
                                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
-                        <Separator layoutX="-18.0" layoutY="198.0" prefWidth="200.0">
+                        <Separator layoutX="-18.0" layoutY="238.0" prefWidth="200.0">
                             <effect>
                                 <DropShadow/>
                             </effect>
                         </Separator>
-                        <Separator layoutX="-15.0" layoutY="633.0" prefHeight="10.0" prefWidth="200.0">
+                        <Separator layoutX="-15.0" layoutY="688.0" prefHeight="10.0" prefWidth="200.0">
                             <effect>
                                 <DropShadow/>
                             </effect>
@@ -150,8 +158,8 @@
                 <AnchorPane id="Content" prefHeight="600.0" prefWidth="1200.0">
                     <children>
                         <GridPane fx:id="boardGrid" alignment="CENTER" gridLinesVisible="true" layoutX="7.0" minWidth="744.0"
-                                  nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="7.0"
-                                  AnchorPane.rightAnchor="-7.0" AnchorPane.topAnchor="0.0">
+                                  nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#mouseOnBoardClicked" AnchorPane.bottomAnchor="0.0"
+                                  AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="-7.0" AnchorPane.topAnchor="0.0">
 
                             <cursor>
                                 <Cursor fx:constant="CROSSHAIR"/>

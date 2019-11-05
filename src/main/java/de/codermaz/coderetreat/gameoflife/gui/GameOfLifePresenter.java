@@ -12,6 +12,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -62,6 +63,7 @@ public class GameOfLifePresenter
 
 		board = gameOfLifeModel.getBoard();
 		updateGameField();
+		gameOfLifeModel.aliveCellsProperty().set( gameField.getNumberOfAliveCells( board ) );
 		updateBarChart();
 
 		prepareBoardGrid();
@@ -70,7 +72,14 @@ public class GameOfLifePresenter
 		secondsSlider.valueProperty().addListener( (observable, oldValue, newValue) -> {
 			if( !secondsSlider.valueChangingProperty().get() )
 			{
-				restartExecutorService( newValue.longValue() );
+				if( newValue.longValue() != 0 )
+				{
+					restartExecutorService( newValue.longValue() );
+				}
+				else
+				{
+					showNextInIntervalButton.disableProperty().set( true );
+				}
 			}
 		} );
 
@@ -81,7 +90,7 @@ public class GameOfLifePresenter
 	{
 		if( Objects.nonNull( future ) )
 		{
-			showNextInIntervalButton.disableProperty().setValue( true );
+			showNextInIntervalButton.disableProperty().set( true );
 			future.cancel( true );
 			startScheduledFuture( (int)timeInterval );
 		}
@@ -101,7 +110,6 @@ public class GameOfLifePresenter
 		scheduledExecutorService = Executors.newScheduledThreadPool( 1 );
 
 		nextGenerationTask = () -> {
-			System.out.println( "scheduledExecutorService is running..." );
 			showNextGenerationInFxAppThread();
 		};
 
@@ -154,12 +162,15 @@ public class GameOfLifePresenter
 		aliveCellsCountLabel.textProperty().bind( new StringBinding()
 		{
 			{
-				bind( gameOfLifeModel.yearsGoneProperty() );
+				bind( gameOfLifeModel.aliveCellsProperty() );
 			}
 
 			@Override protected String computeValue()
 			{
-				return String.valueOf( gameField.getNumberOfAliveCells( board ) );
+				int numberOfAliveCells = gameField.getNumberOfAliveCells( board );
+				if( numberOfAliveCells == 0 )
+					stopAutoGeneration();
+				return String.valueOf( numberOfAliveCells );
 			}
 		} );
 
@@ -171,8 +182,8 @@ public class GameOfLifePresenter
 
 			@Override protected String computeValue()
 			{
-				int seconds = (int)secondsSlider.getValue();
-				String template = "in " + seconds + " secs automatically";
+				int millis = (int)secondsSlider.getValue();
+				String template = "in " + millis + " millis automatically";
 				return template;
 			}
 		} );
@@ -181,13 +192,15 @@ public class GameOfLifePresenter
 
 	private void updateBarChart()
 	{
+		if( aliveCellsBarChart.getData().size() < 100 )
+		{
+			XYChart.Series series = new XYChart.Series();
+			String yearsGoneAsString = String.valueOf( gameOfLifeModel.getYearsGone() );
+			series.setName( yearsGoneAsString );
+			series.getData().add( new XYChart.Data( yearsGoneAsString, gameField.getNumberOfAliveCells( board ) ) );
 
-		XYChart.Series series = new XYChart.Series();
-		String yearsGoneAsString = String.valueOf( gameOfLifeModel.getYearsGone() );
-		series.setName( yearsGoneAsString );
-		series.getData().add( new XYChart.Data( yearsGoneAsString, gameField.getNumberOfAliveCells( board ) ) );
-
-		aliveCellsBarChart.getData().add( series );
+			aliveCellsBarChart.getData().add( series );
+		}
 	}
 
 	private void updateGameField()
@@ -243,7 +256,8 @@ public class GameOfLifePresenter
 		board = generation.getNextBoard();
 
 		gameOfLifeModel.yearsGonePlusByOne();
-
+		gameOfLifeModel.aliveCellsProperty().set( gameField.getNumberOfAliveCells( board ) );
+		gameOfLifeModel.aliveCellsProperty().get(); // to invalidate BooleanBinding
 		updateBarChart();
 		showBoard( board );
 	}
@@ -255,24 +269,34 @@ public class GameOfLifePresenter
 		boardGrid.getColumnConstraints().clear();
 	}
 
-	@FXML void stopGenrationButtonPressed(ActionEvent actionEvent)
+	@FXML void stopGenerationButtonPressed(ActionEvent actionEvent)
 	{
-		System.out.println( "scheduledExecutorService is cancelled" );
-		future.cancel( true );
+		stopAutoGeneration();
+	}
+
+	private void stopAutoGeneration()
+	{
+		if( Objects.nonNull( future ) && !future.isCancelled() )
+		{
+			System.out.println( "scheduledExecutorService is cancelled" );
+			future.cancel( true );
+		}
 		showNextInIntervalButton.disableProperty().setValue( false );
 	}
 
 	@FXML void showNextGenerationInIntervalButtonPressed(ActionEvent actionEvent)
 	{
 		showNextInIntervalButton.disableProperty().setValue( true );
-		int interval = (int)secondsSlider.getValue();
-		startScheduledFuture( interval );
+		long interval = (long)secondsSlider.getValue();
+		if( interval != 0 )
+			startScheduledFuture( interval );
 	}
 
-	private void startScheduledFuture(int interval)
+	private void startScheduledFuture(long interval)
 	{
-		System.out.println( "Time interval for scheduled future is set :" + interval + " secs" );
-		future = scheduledExecutorService.scheduleAtFixedRate( nextGenerationTask, interval, interval, TimeUnit.SECONDS );
+		System.out.println( "Time interval for scheduled future is set to " + interval + " millis" );
+		future = scheduledExecutorService.scheduleAtFixedRate( nextGenerationTask, interval, interval, TimeUnit.MILLISECONDS );
+
 	}
 
 	@FXML void resetFieldButtonPressed(ActionEvent actionEvent)
@@ -284,6 +308,42 @@ public class GameOfLifePresenter
 		board = gameOfLifeModel.getBoard();
 		updateGameField();
 		showInitialBoard();
+	}
+
+	@FXML void mouseOnBoardClicked(MouseEvent mouseEvent)
+	{
+		Label source = (Label)mouseEvent.getTarget();
+
+		Integer colIndex = GridPane.getColumnIndex( source );
+		Integer rowIndex = GridPane.getRowIndex( source );
+
+		int isAlive = board[rowIndex][colIndex];
+		board[rowIndex][colIndex] = (isAlive + 1) % 2;
+
+		if( isAlive == 1 )
+			source.setBackground( new Background( new BackgroundFill( Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY ) ) );
+		else
+			source.setBackground( new Background( new BackgroundFill( Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY ) ) );
+		gameOfLifeModel.aliveCellsProperty().set( gameField.getNumberOfAliveCells( board ) );
+		gameOfLifeModel.aliveCellsProperty().get();
+	}
+
+	@FXML void emptyFieldButtonPressed(ActionEvent actionEvent)
+	{
+		for( int i = 0; i < board.length; i++ )
+		{
+			for( int j = 0; j < board[0].length; j++ )
+			{
+				board[i][j] = 0;
+			}
+		}
+		cleanBoardGrid();
+		gameOfLifeModel.yearsGoneProperty().set( 0 );
+		aliveCellsBarChart.getData().clear();
+
+		updateGameField();
+		showInitialBoard();
+
 	}
 }
 
