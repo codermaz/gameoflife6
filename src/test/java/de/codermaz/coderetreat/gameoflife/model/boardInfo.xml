@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<boardInfo>
+    <name>A1_board</name>
+    <rowsCount>9</rowsCount>
+    <colsCount>9</colsCount>
+    <rows>
+        <row>. . . 1 1 1 . . .</row>
+        <row>. . 1 . . . 1 . .</row>
+        <row>. . 1 . . . 1 . .</row>
+        <row>. . 1 . . . 1 . .</row>
+        <row>. . 1 1 1 1 1 . .</row>
+        <row>. . 1 . . . 1 . .</row>
+        <row>. . 1 . . . 1 . .</row>
+        <row>. . 1 . . . 1 . .</row>
+        <row>. . 1 . . . 1 . .</row>
+    </rows>
+</boardInfo>

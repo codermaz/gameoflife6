@@ -24,7 +24,7 @@ public class GameField
 		int numberOfCells = 0;
 		rowsNumber = board.length;
 
-		for( int[] row : board )
+		for(int[] row : board)
 		{
 			// check: column numbers are equal to row numbers
 			if( row.length != rowsNumber )
@@ -38,9 +38,9 @@ public class GameField
 	public int getNumberOfAliveCells(int[][] board)
 	{
 		int aliveCells = 0;
-		for( int[] row : board )
+		for(int[] row : board)
 		{
-			for( int cell : row )
+			for(int cell : row)
 			{
 				if( cell == 1 )
 				{
@@ -81,7 +81,7 @@ public class GameField
 	{
 		int colNumbers = boardAsList.get( 0 ).length;
 		int neighboursCount = 0;
-		for( int[] neighbourRow : neighbourRows )
+		for(int[] neighbourRow : neighbourRows)
 		{
 			neighboursCount += neighbourRow[cellCol];
 

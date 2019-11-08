@@ -2,7 +2,6 @@ package de.codermaz.coderetreat.gameoflife.gui;
 
 import de.codermaz.coderetreat.gameoflife.gamelogic.Samples;
 import javafx.beans.property.SimpleIntegerProperty;
-
 import javax.annotation.PostConstruct;
 
 
@@ -12,7 +11,8 @@ public class GameOfLifeModel
 	private SimpleIntegerProperty yearsGone  = new SimpleIntegerProperty( 0 );
 	private SimpleIntegerProperty aliveCells = new SimpleIntegerProperty( 0 );
 
-	@PostConstruct public void init()
+	@PostConstruct
+	public void init()
 	{
 		//		this.board = Samples.BOARD_9x9;
 		//		this.board = Samples.INFINITY_BOARD_9x9;
