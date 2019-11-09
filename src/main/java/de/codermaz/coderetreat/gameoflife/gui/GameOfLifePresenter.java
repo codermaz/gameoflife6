@@ -2,6 +2,8 @@ package de.codermaz.coderetreat.gameoflife.gui;
 
 import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
 import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
+import de.codermaz.coderetreat.gameoflife.model.BoardInfo;
+import de.codermaz.coderetreat.gameoflife.model.BoardInfoXml;
 import javafx.application.Platform;
 import javafx.beans.binding.StringBinding;
 import javafx.event.ActionEvent;
@@ -11,25 +13,40 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
-
+import javafx.stage.FileChooser;
 import javax.inject.Inject;
+import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static de.codermaz.coderetreat.gameoflife.model.BoardInfo.ALIVE_COL_CHARS;
+import static de.codermaz.coderetreat.gameoflife.model.BoardInfo.DEAD_COL_CHARS;
+
 
 public class GameOfLifePresenter
 {
 
-	@Inject GameOfLifeModel gameOfLifeModel;
+	@Inject
+	GameOfLifeModel gameOfLifeModel;
 
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
@@ -37,18 +54,32 @@ public class GameOfLifePresenter
 	@FXML // URL location of the FXML file that was given to the FXMLLoader
 	private URL location;
 
-	@FXML private BarChart<Integer, Integer> aliveCellsBarChart;
+	@FXML
+	private MenuItem menuOpen;
+	@FXML
+	private MenuItem menuQuit;
 
-	@FXML private GridPane boardGrid;
-	@FXML private Label    yearsGoneCountLabel;
-	@FXML private Label    aliveCellsCountLabel;
-	@FXML private Slider   secondsSlider;
-	@FXML private Label    inSecondsLabel;
-	@FXML private Button   exitButton;
-	@FXML private Button   showNextInIntervalButton;
-	@FXML private Button   stopGenrationButton;
+	@FXML
+	private BarChart<Integer, Integer> aliveCellsBarChart;
+	@FXML
+	private GridPane                   boardGrid;
+	@FXML
+	private Label                      yearsGoneCountLabel;
+	@FXML
+	private Label                      aliveCellsCountLabel;
+	@FXML
+	private Slider                     secondsSlider;
+	@FXML
+	private Label                      inSecondsLabel;
+	@FXML
+	private Button                     exitButton;
+	@FXML
+	private Button                     showNextInIntervalButton;
+	@FXML
+	private Button                     stopGenerationButton;
 
 	private int[][]                  board;
+	private int[][]                  resetBoard;
 	private ColumnConstraints        columnConstraints = new ColumnConstraints();
 	private RowConstraints           rowConstraints    = new RowConstraints();
 	private GameField                gameField;
@@ -57,11 +88,27 @@ public class GameOfLifePresenter
 	private Future<?>                future;
 	private Runnable                 nextGenerationTask;
 
-	@FXML void initialize()
+	@FXML
+	void initialize()
 	{
 		handleExecuterService();
+		handleFileMenu();
 
-		board = gameOfLifeModel.getBoard();
+		board = gameOfLifeModel.gameBoardProperty().get();
+		resetBoard = board.clone();
+		gameOfLifeModel.gameBoardProperty().addListener( (observable, oldValue, newValue) -> {
+			if( newValue != null )
+			{
+				board = newValue;
+				startGame();
+			}
+		} );
+
+		startGame();
+	}
+
+	private void startGame()
+	{
 		updateGameField();
 		gameOfLifeModel.aliveCellsProperty().set( gameField.getNumberOfAliveCells( board ) );
 		updateBarChart();
@@ -69,6 +116,80 @@ public class GameOfLifePresenter
 		prepareBoardGrid();
 		handleTextProperties();
 		handleDisabilityProperties();
+		handleSecondsSlider();
+
+		showInitialBoard();
+	}
+
+	private void handleFileMenu()
+	{
+		final FileChooser fileChooser = new FileChooser();
+		configuringFileChooser( fileChooser );
+		menuOpen.setOnAction( event -> {
+			File lastChosenBoardXmlFile = gameOfLifeModel.lastChoosenFileProperty().get();
+			if( lastChosenBoardXmlFile != null )
+				fileChooser.setInitialDirectory( new File( lastChosenBoardXmlFile.getParent() ) );
+			File fileChoosen = fileChooser.showOpenDialog( (boardGrid).getScene().getWindow() );
+			BoardInfo boardInfo = new BoardInfo( fileChoosen.toString() );
+			Optional<BoardInfoXml> boardInfoXml = boardInfo.jaxbXmlFileToObject();
+			if( boardInfoXml.isPresent() )
+			{
+				gameOfLifeModel.lastChoosenFileProperty().set( fileChoosen );
+				int[][] newBoard = transferBoardXmlToGame( boardInfoXml.get() );
+
+				cleanBoardGrid();
+				gameOfLifeModel.gameBoardProperty().set( newBoard );
+				resetBoard = newBoard.clone();
+			}
+
+		} );
+		menuQuit.setOnAction( event -> Platform.exit() );
+	}
+
+	private int[][] transferBoardXmlToGame(BoardInfoXml boardInfoXml)
+	{
+		int rowsCount = boardInfoXml.getRowsCount();
+		int colsCount = boardInfoXml.getColsCount();
+		int[][] newBoard = new int[rowsCount][colsCount];
+		List<String> rows = boardInfoXml.getRows();
+
+		for(int i = 0; i < rowsCount; i++)
+		{
+			String row = rows.get( i );
+			for(int j = 0, k = 0; k < row.length(); k++)
+			{
+				boolean isCharInDeadColChars = DEAD_COL_CHARS.contains( String.valueOf( row.charAt( k ) ) );
+				boolean isCharInLiveColChars = ALIVE_COL_CHARS.contains( String.valueOf( row.charAt( k ) ) );
+
+				if( isCharInLiveColChars )
+				{
+					newBoard[i][j] = 1;
+					j++;
+				}
+				else
+				{
+					if( isCharInDeadColChars )
+					{
+						newBoard[i][j] = 0;
+						j++;
+					}
+				}
+			}
+		}
+		return newBoard;
+	}
+
+	private void configuringFileChooser(FileChooser fileChooser)
+	{
+		fileChooser.setTitle( "Select board xml file" );
+
+		fileChooser.getExtensionFilters().addAll(//
+			new FileChooser.ExtensionFilter( "All Files", "*.*" ), //
+			new FileChooser.ExtensionFilter( "XML", "*.xml" ) );
+	}
+
+	private void handleSecondsSlider()
+	{
 		secondsSlider.valueProperty().addListener( (observable, oldValue, newValue) -> {
 			if( !secondsSlider.valueChangingProperty().get() )
 			{
@@ -82,8 +203,6 @@ public class GameOfLifePresenter
 				}
 			}
 		} );
-
-		showInitialBoard();
 	}
 
 	private void restartExecutorService(long timeInterval)
@@ -99,10 +218,10 @@ public class GameOfLifePresenter
 	private void handleDisabilityProperties()
 	{
 		showNextInIntervalButton.disableProperty().addListener( (observable, oldValue, newValue) -> {
-			stopGenrationButton.disableProperty().setValue( oldValue );
+			stopGenerationButton.disableProperty().setValue( oldValue );
 		} );
 
-		stopGenrationButton.disableProperty().setValue( true );
+		stopGenerationButton.disableProperty().setValue( true );
 	}
 
 	private void handleExecuterService()
@@ -153,7 +272,8 @@ public class GameOfLifePresenter
 				bind( gameOfLifeModel.yearsGoneProperty() );
 			}
 
-			@Override protected String computeValue()
+			@Override
+			protected String computeValue()
 			{
 				return String.valueOf( gameOfLifeModel.getYearsGone() );
 			}
@@ -165,7 +285,8 @@ public class GameOfLifePresenter
 				bind( gameOfLifeModel.aliveCellsProperty() );
 			}
 
-			@Override protected String computeValue()
+			@Override
+			protected String computeValue()
 			{
 				int numberOfAliveCells = gameField.getNumberOfAliveCells( board );
 				if( numberOfAliveCells == 0 )
@@ -180,7 +301,8 @@ public class GameOfLifePresenter
 				bind( secondsSlider.valueProperty() );
 			}
 
-			@Override protected String computeValue()
+			@Override
+			protected String computeValue()
 			{
 				int millis = (int)secondsSlider.getValue();
 				String template = "in " + millis + " millis automatically";
@@ -216,11 +338,11 @@ public class GameOfLifePresenter
 
 	private void showBoard(int[][] board)
 	{
-		for( int i = 0; i < board.length; i++ ) // rows number of board
+		for(int i = 0; i < board.length; i++) // rows number of board
 		{
 			boardGrid.getColumnConstraints().add( columnConstraints );
 			boardGrid.getRowConstraints().add( rowConstraints );
-			for( int j = 0; j < this.board[0].length; j++ ) // columns number of board
+			for(int j = 0; j < this.board[0].length; j++) // columns number of board
 			{
 				boardGrid.add( newCell( this.board[i][j] ), j, i );
 			}
@@ -235,14 +357,15 @@ public class GameOfLifePresenter
 		Label label = new Label();
 		if( isAlive == 1 )
 			label.setBackground( new Background( new BackgroundFill( Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY ) ) );
-		else //if( isAlive == 0 )
+		else
 			label.setBackground( new Background( new BackgroundFill( Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY ) ) );
 
 		label.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
 		return label;
 	}
 
-	@FXML void nextGenerationButtonPressed(ActionEvent event)
+	@FXML
+	void nextGenerationButtonPressed(ActionEvent event)
 	{
 		showNextGenerationInFxAppThread();
 	}
@@ -269,7 +392,8 @@ public class GameOfLifePresenter
 		boardGrid.getColumnConstraints().clear();
 	}
 
-	@FXML void stopGenerationButtonPressed(ActionEvent actionEvent)
+	@FXML
+	void stopGenerationButtonPressed(ActionEvent actionEvent)
 	{
 		stopAutoGeneration();
 	}
@@ -284,7 +408,8 @@ public class GameOfLifePresenter
 		showNextInIntervalButton.disableProperty().setValue( false );
 	}
 
-	@FXML void showNextGenerationInIntervalButtonPressed(ActionEvent actionEvent)
+	@FXML
+	void showNextGenerationInIntervalButtonPressed(ActionEvent actionEvent)
 	{
 		showNextInIntervalButton.disableProperty().setValue( true );
 		long interval = (long)secondsSlider.getValue();
@@ -299,18 +424,19 @@ public class GameOfLifePresenter
 
 	}
 
-	@FXML void resetFieldButtonPressed(ActionEvent actionEvent)
+	@FXML
+	void resetFieldButtonPressed(ActionEvent actionEvent)
 	{
 		cleanBoardGrid();
 		gameOfLifeModel.yearsGoneProperty().set( 0 );
 		aliveCellsBarChart.getData().clear();
 
-		board = gameOfLifeModel.getBoard();
-		updateGameField();
-		showInitialBoard();
+		gameOfLifeModel.gameBoardProperty().set( null );
+		gameOfLifeModel.gameBoardProperty().set( resetBoard );
 	}
 
-	@FXML void mouseOnBoardClicked(MouseEvent mouseEvent)
+	@FXML
+	void mouseOnBoardClicked(MouseEvent mouseEvent)
 	{
 		Label source = (Label)mouseEvent.getTarget();
 
@@ -328,11 +454,12 @@ public class GameOfLifePresenter
 		gameOfLifeModel.aliveCellsProperty().get();
 	}
 
-	@FXML void emptyFieldButtonPressed(ActionEvent actionEvent)
+	@FXML
+	void emptyFieldButtonPressed(ActionEvent actionEvent)
 	{
-		for( int i = 0; i < board.length; i++ )
+		for(int i = 0; i < board.length; i++)
 		{
-			for( int j = 0; j < board[0].length; j++ )
+			for(int j = 0; j < board[0].length; j++)
 			{
 				board[i][j] = 0;
 			}
@@ -343,7 +470,6 @@ public class GameOfLifePresenter
 
 		updateGameField();
 		showInitialBoard();
-
 	}
 }
 
