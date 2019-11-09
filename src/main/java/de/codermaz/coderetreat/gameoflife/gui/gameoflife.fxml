@@ -140,7 +140,7 @@
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                     </padding>
                                 </Label>
-                                <Button fx:id="stopGenrationButton" layoutY="395.0" mnemonicParsing="false"
+                                <Button fx:id="stopGenerationButton" layoutY="395.0" mnemonicParsing="false"
                                         onAction="#stopGenerationButtonPressed" prefWidth="170.0" text="Stop Generation"
                                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                     <padding>
