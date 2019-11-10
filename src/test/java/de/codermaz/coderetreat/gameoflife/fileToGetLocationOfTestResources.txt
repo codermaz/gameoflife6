@@ -1,0 +1,1 @@
+don't delete this file. it is need to get the location of test-resource files

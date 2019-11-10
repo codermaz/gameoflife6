@@ -10,12 +10,15 @@ import javafx.stage.Stage;
 
 public class App extends Application
 {
+	public static String TITLE_GAME_OF_LIFE = "Game of Life";
+
 	public static void main(String[] args)
 	{
 		launch( args );
 	}
 
-	@Override public void start(Stage primaryStage)
+	@Override
+	public void start(Stage primaryStage)
 	{
 		Injector.instantiateModelOrService( GameOfLifeModel.class );
 		GameOfLifeView gameOfLifeView = new GameOfLifeView();
@@ -24,8 +27,9 @@ public class App extends Application
 		scene.getStylesheets().add( uri );
 
 		primaryStage.setMinWidth( 1200 );
-		primaryStage.setTitle( "Game Of Life" );
+		primaryStage.setTitle( TITLE_GAME_OF_LIFE );
 		primaryStage.setScene( scene );
+
 		primaryStage.show();
 
 	}

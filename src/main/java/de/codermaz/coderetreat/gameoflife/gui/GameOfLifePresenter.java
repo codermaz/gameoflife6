@@ -1,5 +1,6 @@
 package de.codermaz.coderetreat.gameoflife.gui;
 
+import de.codermaz.coderetreat.gameoflife.App;
 import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
 import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfo;
@@ -24,12 +25,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javax.inject.Inject;
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -37,9 +39,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static de.codermaz.coderetreat.gameoflife.model.BoardInfo.ALIVE_COL_CHARS;
-import static de.codermaz.coderetreat.gameoflife.model.BoardInfo.DEAD_COL_CHARS;
 
 
 public class GameOfLifePresenter
@@ -55,7 +54,11 @@ public class GameOfLifePresenter
 	private URL location;
 
 	@FXML
+	private VBox     mainVBox;
+	@FXML
 	private MenuItem menuOpen;
+	@FXML
+	private MenuItem menuSave;
 	@FXML
 	private MenuItem menuQuit;
 
@@ -129,13 +132,16 @@ public class GameOfLifePresenter
 			File lastChosenBoardXmlFile = gameOfLifeModel.lastChoosenFileProperty().get();
 			if( lastChosenBoardXmlFile != null )
 				fileChooser.setInitialDirectory( new File( lastChosenBoardXmlFile.getParent() ) );
-			File fileChoosen = fileChooser.showOpenDialog( (boardGrid).getScene().getWindow() );
-			BoardInfo boardInfo = new BoardInfo( fileChoosen.toString() );
-			Optional<BoardInfoXml> boardInfoXml = boardInfo.jaxbXmlFileToObject();
+			File fileChosen = fileChooser.showOpenDialog( (boardGrid).getScene().getWindow() );
+			BoardInfo boardInfo = new BoardInfo();
+			Optional<BoardInfoXml> boardInfoXml = boardInfo.jaxbXmlFileToObject( fileChosen.toString() );
 			if( boardInfoXml.isPresent() )
 			{
-				gameOfLifeModel.lastChoosenFileProperty().set( fileChoosen );
-				int[][] newBoard = transferBoardXmlToGame( boardInfoXml.get() );
+				Stage stage = (Stage)mainVBox.getScene().getWindow();
+				stage.setTitle( App.TITLE_GAME_OF_LIFE + " - " + boardInfoXml.get().getName() + " - " + fileChosen.getAbsolutePath() );
+				gameOfLifeModel.lastChoosenFileProperty().set( fileChosen );
+
+				int[][] newBoard = boardInfo.transferBoardXmlToGameBoard( boardInfoXml.get() );
 
 				cleanBoardGrid();
 				gameOfLifeModel.gameBoardProperty().set( newBoard );
@@ -144,39 +150,6 @@ public class GameOfLifePresenter
 
 		} );
 		menuQuit.setOnAction( event -> Platform.exit() );
-	}
-
-	private int[][] transferBoardXmlToGame(BoardInfoXml boardInfoXml)
-	{
-		int rowsCount = boardInfoXml.getRowsCount();
-		int colsCount = boardInfoXml.getColsCount();
-		int[][] newBoard = new int[rowsCount][colsCount];
-		List<String> rows = boardInfoXml.getRows();
-
-		for(int i = 0; i < rowsCount; i++)
-		{
-			String row = rows.get( i );
-			for(int j = 0, k = 0; k < row.length(); k++)
-			{
-				boolean isCharInDeadColChars = DEAD_COL_CHARS.contains( String.valueOf( row.charAt( k ) ) );
-				boolean isCharInLiveColChars = ALIVE_COL_CHARS.contains( String.valueOf( row.charAt( k ) ) );
-
-				if( isCharInLiveColChars )
-				{
-					newBoard[i][j] = 1;
-					j++;
-				}
-				else
-				{
-					if( isCharInDeadColChars )
-					{
-						newBoard[i][j] = 0;
-						j++;
-					}
-				}
-			}
-		}
-		return newBoard;
 	}
 
 	private void configuringFileChooser(FileChooser fileChooser)
@@ -217,9 +190,8 @@ public class GameOfLifePresenter
 
 	private void handleDisabilityProperties()
 	{
-		showNextInIntervalButton.disableProperty().addListener( (observable, oldValue, newValue) -> {
-			stopGenerationButton.disableProperty().setValue( oldValue );
-		} );
+		showNextInIntervalButton.disableProperty()
+			.addListener( (observable, oldValue, newValue) -> stopGenerationButton.disableProperty().setValue( oldValue ) );
 
 		stopGenerationButton.disableProperty().setValue( true );
 	}
@@ -228,9 +200,7 @@ public class GameOfLifePresenter
 	{
 		scheduledExecutorService = Executors.newScheduledThreadPool( 1 );
 
-		nextGenerationTask = () -> {
-			showNextGenerationInFxAppThread();
-		};
+		nextGenerationTask = () -> showNextGenerationInFxAppThread();
 
 		exitButton.setOnAction( actionEvent -> {
 			scheduledExecutorService.shutdown();

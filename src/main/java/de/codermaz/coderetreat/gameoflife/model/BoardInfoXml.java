@@ -40,6 +40,26 @@ public class BoardInfoXml
 		return rows;
 	}
 
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public void setRowsCount(int rowsCount)
+	{
+		this.rowsCount = rowsCount;
+	}
+
+	public void setColsCount(int colsCount)
+	{
+		this.colsCount = colsCount;
+	}
+
+	public void setRows(List<String> rows)
+	{
+		this.rows = rows;
+	}
+
 	@Override
 	public String toString()
 	{
