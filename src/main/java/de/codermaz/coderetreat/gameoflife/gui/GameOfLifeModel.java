@@ -9,10 +9,10 @@ import java.io.File;
 
 public class GameOfLifeModel
 {
+	private SimpleObjectProperty<int[][]> gameBoard      = new SimpleObjectProperty<>( null );
 	private SimpleIntegerProperty         yearsGone      = new SimpleIntegerProperty( 0 );
 	private SimpleIntegerProperty         aliveCells     = new SimpleIntegerProperty( 0 );
 	private SimpleObjectProperty<File>    lastChosenFile = new SimpleObjectProperty();
-	private SimpleObjectProperty<int[][]> gameBoard      = new SimpleObjectProperty<>( null );
 
 	@PostConstruct
 	public void init()

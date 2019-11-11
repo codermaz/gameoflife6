@@ -144,6 +144,8 @@ public class GameOfLifePresenter
 				int[][] newBoard = boardInfo.transferBoardXmlToGameBoard( boardInfoXml.get() );
 
 				cleanBoardGrid();
+				gameOfLifeModel.yearsGoneProperty().set( 0 );
+				aliveCellsBarChart.getData().clear();
 				gameOfLifeModel.gameBoardProperty().set( newBoard );
 				resetBoard = newBoard.clone();
 			}
@@ -200,7 +202,7 @@ public class GameOfLifePresenter
 	{
 		scheduledExecutorService = Executors.newScheduledThreadPool( 1 );
 
-		nextGenerationTask = () -> showNextGenerationInFxAppThread();
+		nextGenerationTask = this::showNextGenerationInFxAppThread;
 
 		exitButton.setOnAction( actionEvent -> {
 			scheduledExecutorService.shutdown();
