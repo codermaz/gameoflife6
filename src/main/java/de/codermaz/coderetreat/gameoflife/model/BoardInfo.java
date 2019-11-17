@@ -150,7 +150,7 @@ public class BoardInfo
 			if( !file.getParentFile().mkdirs() )
 			{
 				System.out.println( "Directory for " + pathWithoutFilePrefix + " could not created!" );
-				return true;
+				return false;
 			}
 		}
 		try
@@ -160,16 +160,16 @@ public class BoardInfo
 				if( !file.createNewFile() )
 				{
 					System.out.println( "File " + pathWithoutFilePrefix + " could not created!" );
-					return true;
+					return false;
 				}
 			}
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 }

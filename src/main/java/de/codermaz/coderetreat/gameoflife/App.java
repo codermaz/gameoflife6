@@ -3,6 +3,7 @@ package de.codermaz.coderetreat.gameoflife;
 import com.airhacks.afterburner.injection.Injector;
 import de.codermaz.coderetreat.gameoflife.gui.GameOfLifeModel;
 import de.codermaz.coderetreat.gameoflife.gui.GameOfLifeView;
+import de.codermaz.coderetreat.gameoflife.gui.saveboard.SaveBoardModel;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -20,7 +21,7 @@ public class App extends Application
 	@Override
 	public void start(Stage primaryStage)
 	{
-		Injector.instantiateModelOrService( GameOfLifeModel.class );
+		instantiateModels();
 		GameOfLifeView gameOfLifeView = new GameOfLifeView();
 		Scene scene = new Scene( gameOfLifeView.getView() );
 		final String uri = getClass().getResource( "app.css" ).toExternalForm();
@@ -32,5 +33,11 @@ public class App extends Application
 
 		primaryStage.show();
 
+	}
+
+	public void instantiateModels()
+	{
+		Injector.instantiateModelOrService( GameOfLifeModel.class );
+		Injector.instantiateModelOrService( SaveBoardModel.class );
 	}
 }

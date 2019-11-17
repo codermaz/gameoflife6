@@ -1,19 +1,24 @@
 package de.codermaz.coderetreat.gameoflife.gui;
 
-import de.codermaz.coderetreat.gameoflife.App;
 import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
 import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
+import de.codermaz.coderetreat.gameoflife.gui.saveboard.SaveBoardModel;
+import de.codermaz.coderetreat.gameoflife.gui.saveboard.SaveBoardView;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfo;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfoXml;
 import javafx.application.Platform;
 import javafx.beans.binding.StringBinding;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
@@ -32,6 +37,7 @@ import javafx.stage.Stage;
 import javax.inject.Inject;
 import java.io.File;
 import java.net.URL;
+import java.util.Deque;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -40,12 +46,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static de.codermaz.coderetreat.gameoflife.App.TITLE_GAME_OF_LIFE;
+
 
 public class GameOfLifePresenter
 {
 
 	@Inject
 	GameOfLifeModel gameOfLifeModel;
+	@Inject
+	SaveBoardModel  saveBoardModel;
 
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
@@ -56,9 +66,15 @@ public class GameOfLifePresenter
 	@FXML
 	private VBox     mainVBox;
 	@FXML
+	private Menu     fileMenu;
+	@FXML
 	private MenuItem menuOpen;
 	@FXML
+	private Menu     openRecentMenu;
+	@FXML
 	private MenuItem menuSave;
+	@FXML
+	private MenuItem menuSaveAs;
 	@FXML
 	private MenuItem menuQuit;
 
@@ -96,18 +112,23 @@ public class GameOfLifePresenter
 	{
 		handleExecuterService();
 		handleFileMenu();
+		prepareBoardBindings();
 
+		startGame();
+	}
+
+	private void prepareBoardBindings()
+	{
 		board = gameOfLifeModel.gameBoardProperty().get();
 		resetBoard = board.clone();
 		gameOfLifeModel.gameBoardProperty().addListener( (observable, oldValue, newValue) -> {
 			if( newValue != null )
 			{
 				board = newValue;
+				resetBoard = board.clone();
 				startGame();
 			}
 		} );
-
-		startGame();
 	}
 
 	private void startGame()
@@ -128,30 +149,71 @@ public class GameOfLifePresenter
 	{
 		final FileChooser fileChooser = new FileChooser();
 		configuringFileChooser( fileChooser );
-		menuOpen.setOnAction( event -> {
-			File lastChosenBoardXmlFile = gameOfLifeModel.lastChoosenFileProperty().get();
-			if( lastChosenBoardXmlFile != null )
-				fileChooser.setInitialDirectory( new File( lastChosenBoardXmlFile.getParent() ) );
-			File fileChosen = fileChooser.showOpenDialog( (boardGrid).getScene().getWindow() );
-			BoardInfo boardInfo = new BoardInfo();
-			Optional<BoardInfoXml> boardInfoXml = boardInfo.jaxbXmlFileToObject( fileChosen.toString() );
-			if( boardInfoXml.isPresent() )
-			{
-				Stage stage = (Stage)mainVBox.getScene().getWindow();
-				stage.setTitle( App.TITLE_GAME_OF_LIFE + " - " + boardInfoXml.get().getName() + " - " + fileChosen.getAbsolutePath() );
-				gameOfLifeModel.lastChoosenFileProperty().set( fileChosen );
-
-				int[][] newBoard = boardInfo.transferBoardXmlToGameBoard( boardInfoXml.get() );
-
-				cleanBoardGrid();
-				gameOfLifeModel.yearsGoneProperty().set( 0 );
-				aliveCellsBarChart.getData().clear();
-				gameOfLifeModel.gameBoardProperty().set( newBoard );
-				resetBoard = newBoard.clone();
-			}
-
-		} );
+		menuOpen.setOnAction( event -> menuOpenPressed( fileChooser ) );
+		menuSaveAs.setOnAction( event -> menuSaveAsSelected() );
 		menuQuit.setOnAction( event -> Platform.exit() );
+
+		gameOfLifeModel.setOpenRecentMenu( openRecentMenu );
+		openRecentMenu.getItems().addListener( (ListChangeListener<? super MenuItem>)c -> {
+			ObservableList<? extends MenuItem> openRecentMenuItems = c.getList();
+			openRecentMenuItems.forEach( menuItem -> //
+				menuItem.setOnAction( event -> //
+					updateBoardAfterFileSelected( new File( menuItem.getText() ) ) ) );
+		} );
+		gameOfLifeModel.setFileMenu( fileMenu );
+	}
+
+	private void menuSaveAsSelected()
+	{
+		SaveBoardView saveBoardView = new SaveBoardView();
+		Scene scene = new Scene( saveBoardView.getView() );
+		Stage primaryStage = (Stage)mainVBox.getScene().getWindow();
+		gameOfLifeModel.primaryStageProperty().set( primaryStage );
+		gameOfLifeModel.returnSceneProperty().set( primaryStage.getScene() );
+		primaryStage.setMinWidth( 1200 );
+		File lastChosenBoardXmlFile = saveBoardModel.lastChosenFileProperty().get();
+		String fileName = lastChosenBoardXmlFile == null ? " " : " " + lastChosenBoardXmlFile.getAbsolutePath() + " ";
+		primaryStage.setTitle( TITLE_GAME_OF_LIFE + fileName + "- Save board" );
+		primaryStage.setScene( scene );
+		primaryStage.show();
+	}
+
+	private void menuOpenPressed(FileChooser fileChooser)
+	{
+		File lastChosenBoardXmlFile = saveBoardModel.lastChosenFileProperty().get();
+		if( lastChosenBoardXmlFile != null )
+			fileChooser.setInitialDirectory( new File( lastChosenBoardXmlFile.getParent() ) );
+		File fileChosen = fileChooser.showOpenDialog( (boardGrid).getScene().getWindow() );
+		if( fileChosen == null )
+			return;
+		updateBoardAfterFileSelected( fileChosen );
+	}
+
+	private void updateBoardAfterFileSelected(File fileChosen)
+	{
+		BoardInfo boardInfo = new BoardInfo();
+		Optional<BoardInfoXml> boardInfoXml = boardInfo.jaxbXmlFileToObject( fileChosen.toString() );
+		if( boardInfoXml.isPresent() )
+		{
+			saveBoardModel.addToRecentFiles( fileChosen );
+			Deque<File> recentOpenedFiles = saveBoardModel.getRecentOpenedFiles();
+			gameOfLifeModel.prepareSubMenu( recentOpenedFiles );
+			Stage stage = (Stage)mainVBox.getScene().getWindow();
+			stage.setTitle( TITLE_GAME_OF_LIFE + " - " + boardInfoXml.get().getName() + " - " + fileChosen.getAbsolutePath() );
+			saveBoardModel.lastChosenFileProperty().set( fileChosen );
+
+			int[][] newBoard = boardInfo.transferBoardXmlToGameBoard( boardInfoXml.get() );
+
+			cleanBoardGrid();
+			gameOfLifeModel.yearsGoneProperty().set( 0 );
+			aliveCellsBarChart.getData().clear();
+			gameOfLifeModel.gameBoardProperty().set( newBoard );
+		}
+		else
+		{
+			saveBoardModel.removeFileFromRecentOpened( fileChosen );
+			gameOfLifeModel.prepareSubMenu( saveBoardModel.getRecentOpenedFiles() );
+		}
 	}
 
 	private void configuringFileChooser(FileChooser fileChooser)
@@ -209,14 +271,6 @@ public class GameOfLifePresenter
 			System.out.println( "scheduledExecutorService is shutdown." );
 			Platform.exit();
 		} );
-	}
-
-	private void showNextGenerationInFxAppThread()
-	{
-		if( Platform.isFxApplicationThread() )
-			showNextGeneration();
-		else
-			Platform.runLater( this::showNextGeneration );
 	}
 
 	private void prepareBoardGrid()
@@ -410,20 +464,28 @@ public class GameOfLifePresenter
 	@FXML
 	void mouseOnBoardClicked(MouseEvent mouseEvent)
 	{
-		Label source = (Label)mouseEvent.getTarget();
+		try
+		{
+			Label source = (Label)mouseEvent.getTarget();
 
-		Integer colIndex = GridPane.getColumnIndex( source );
-		Integer rowIndex = GridPane.getRowIndex( source );
+			Integer colIndex = GridPane.getColumnIndex( source );
+			Integer rowIndex = GridPane.getRowIndex( source );
 
-		int isAlive = board[rowIndex][colIndex];
-		board[rowIndex][colIndex] = (isAlive + 1) % 2;
+			int isAlive = board[rowIndex][colIndex];
+			board[rowIndex][colIndex] = (isAlive + 1) % 2;
 
-		if( isAlive == 1 )
-			source.setBackground( new Background( new BackgroundFill( Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY ) ) );
-		else
-			source.setBackground( new Background( new BackgroundFill( Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY ) ) );
-		gameOfLifeModel.aliveCellsProperty().set( gameField.getNumberOfAliveCells( board ) );
-		gameOfLifeModel.aliveCellsProperty().get();
+			if( isAlive == 1 )
+				source.setBackground( new Background( new BackgroundFill( Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY ) ) );
+			else
+				source.setBackground( new Background( new BackgroundFill( Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY ) ) );
+			gameOfLifeModel.aliveCellsProperty().set( gameField.getNumberOfAliveCells( board ) );
+			gameOfLifeModel.aliveCellsProperty().get();
+		}
+		catch(ClassCastException e)
+		{
+			// javafx.scene.layout.GridPane cannot be cast to javafx.scene.control.Label
+			// ignore, because it occurs if user drags the gridpane
+		}
 	}
 
 	@FXML
@@ -442,6 +504,14 @@ public class GameOfLifePresenter
 
 		updateGameField();
 		showInitialBoard();
+	}
+
+	private void showNextGenerationInFxAppThread()
+	{
+		if( Platform.isFxApplicationThread() )
+			showNextGeneration();
+		else
+			Platform.runLater( this::showNextGeneration );
 	}
 }
 

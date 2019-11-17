@@ -24,21 +24,21 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1200.0"
-      prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171"
+      prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.151"
       fx:id="mainVBox"
       fx:controller="de.codermaz.coderetreat.gameoflife.gui.GameOfLifePresenter">
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
                     <items>
                         <MenuItem mnemonicParsing="false" text="New"/>
                         <MenuItem fx:id="menuOpen" mnemonicParsing="false" text="Open…"/>
-                        <Menu mnemonicParsing="false" text="Open Recent"/>
+                        <Menu fx:id="openRecentMenu" mnemonicParsing="false" text="Open Recent"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem mnemonicParsing="false" text="Close"/>
                         <MenuItem fx:id="menuSave" mnemonicParsing="false" text="Save"/>
-                        <MenuItem mnemonicParsing="false" text="Save As…"/>
+                        <MenuItem fx:id="menuSaveAs" mnemonicParsing="false" text="Save As…"/>
                         <MenuItem mnemonicParsing="false" text="Revert"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem mnemonicParsing="false" text="Preferences…"/>

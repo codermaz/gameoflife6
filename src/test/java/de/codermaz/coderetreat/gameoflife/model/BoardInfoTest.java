@@ -69,7 +69,7 @@ public class BoardInfoTest
 		String fullPathOfXmlFile = preparePathForTestFile();
 		BoardInfo boardInfo = new BoardInfo();
 
-		if( boardInfo.prepareFileForMarshalling( fullPathOfXmlFile ) )
+		if( !boardInfo.prepareFileForMarshalling( fullPathOfXmlFile ) )
 		{
 			System.out.println( fullPathOfXmlFile + " could not prepared for marshalling!" );
 			return;
