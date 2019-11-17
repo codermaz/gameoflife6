@@ -1,4 +1,4 @@
-package de.codermaz.coderetreat.gameoflife.gui;
+package de.codermaz.coderetreat.gameoflife.guifx;
 
 import de.codermaz.coderetreat.gameoflife.gamelogic.Samples;
 import javafx.application.Platform;

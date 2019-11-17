@@ -1,9 +1,9 @@
-package de.codermaz.coderetreat.gameoflife.gui;
+package de.codermaz.coderetreat.gameoflife.guifx;
 
 import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
 import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
-import de.codermaz.coderetreat.gameoflife.gui.saveboard.SaveBoardModel;
-import de.codermaz.coderetreat.gameoflife.gui.saveboard.SaveBoardView;
+import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardModel;
+import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardView;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfo;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfoXml;
 import javafx.application.Platform;

@@ -1,4 +1,4 @@
-package de.codermaz.coderetreat.gameoflife.gui.saveboard;
+package de.codermaz.coderetreat.gameoflife.guifx.saveboard;
 
 import com.airhacks.afterburner.views.FXMLView;
 import java.util.function.Function;

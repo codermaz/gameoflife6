@@ -26,7 +26,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1200.0"
       prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.151"
       fx:id="mainVBox"
-      fx:controller="de.codermaz.coderetreat.gameoflife.gui.GameOfLifePresenter">
+      fx:controller="de.codermaz.coderetreat.gameoflife.guifx.GameOfLifePresenter">
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>
@@ -43,7 +43,7 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem mnemonicParsing="false" text="Preferences…"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="menuQuit" mnemonicParsing="false" text="Quit"/>
+                        <MenuItem fx:id="menuQuit" mnemonicParsing="false" text="Exit"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">

@@ -1,4 +1,4 @@
-package de.codermaz.coderetreat.gameoflife.gui.saveboard;
+package de.codermaz.coderetreat.gameoflife.guifx.saveboard;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javax.annotation.PostConstruct;

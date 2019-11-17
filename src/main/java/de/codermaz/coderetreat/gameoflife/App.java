@@ -1,9 +1,9 @@
 package de.codermaz.coderetreat.gameoflife;
 
 import com.airhacks.afterburner.injection.Injector;
-import de.codermaz.coderetreat.gameoflife.gui.GameOfLifeModel;
-import de.codermaz.coderetreat.gameoflife.gui.GameOfLifeView;
-import de.codermaz.coderetreat.gameoflife.gui.saveboard.SaveBoardModel;
+import de.codermaz.coderetreat.gameoflife.guifx.GameOfLifeModel;
+import de.codermaz.coderetreat.gameoflife.guifx.GameOfLifeView;
+import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardModel;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

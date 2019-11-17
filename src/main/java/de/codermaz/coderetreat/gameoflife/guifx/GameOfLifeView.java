@@ -1,7 +1,6 @@
-package de.codermaz.coderetreat.gameoflife.gui;
+package de.codermaz.coderetreat.gameoflife.guifx;
 
 import com.airhacks.afterburner.views.FXMLView;
-
 import java.util.function.Function;
 
 
