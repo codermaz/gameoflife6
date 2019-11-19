@@ -62,7 +62,8 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="About GameOfLife cdrmz"/>
+                        <MenuItem fx:id="menuInfo" mnemonicParsing="false" text="Info Game of Life"/>
+                        <MenuItem fx:id="menuAbout" mnemonicParsing="false" text="About jemAdem"/>
                     </items>
                 </Menu>
             </menus>

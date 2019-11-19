@@ -16,7 +16,9 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -35,7 +37,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.inject.Inject;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Deque;
 import java.util.Objects;
@@ -77,6 +82,8 @@ public class GameOfLifePresenter
 	private MenuItem menuSaveAs;
 	@FXML
 	private MenuItem menuQuit;
+	@FXML
+	private MenuItem menuInfo;
 
 	@FXML
 	private BarChart<Integer, Integer> aliveCellsBarChart;
@@ -99,13 +106,14 @@ public class GameOfLifePresenter
 
 	private int[][]                  board;
 	private int[][]                  resetBoard;
-	private ColumnConstraints        columnConstraints = new ColumnConstraints();
-	private RowConstraints           rowConstraints    = new RowConstraints();
+	private ColumnConstraints        columnConstraints     = new ColumnConstraints();
+	private RowConstraints           rowConstraints        = new RowConstraints();
 	private GameField                gameField;
 	private Generation               generation;
 	private ScheduledExecutorService scheduledExecutorService;
 	private Future<?>                future;
 	private Runnable                 nextGenerationTask;
+	private String                   GAME_OF_LIFE_WIKI_URL = "https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life";
 
 	@FXML
 	void initialize()
@@ -161,6 +169,44 @@ public class GameOfLifePresenter
 					updateBoardAfterFileSelected( new File( menuItem.getText() ) ) ) );
 		} );
 		gameOfLifeModel.setFileMenu( fileMenu );
+
+		menuInfo.setOnAction( event -> menuHelpSelected() );
+
+	}
+
+	private void menuHelpSelected()
+	{
+		String contentText =
+			"Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. "
+				+ "At each step in time, the following transitions occur:\n\n" //
+				+ "1. Any live cell with two or three neighbors survives.\n\n"
+				+ "2. Any dead cell with three live neighbors becomes a live cell.\n\n"
+				+ "3. All other live cells die in the next generation. Similarly, all other dead cells stay dead.\n\n"
+				+ "Do you want to open WikiPage in browser?\n"//
+				+ GAME_OF_LIFE_WIKI_URL;
+		Alert alert = new Alert( Alert.AlertType.INFORMATION, contentText, ButtonType.YES, ButtonType.NO );
+		alert.titleProperty().setValue( "Info" );
+		alert.headerTextProperty().setValue( "Conway's Game of Life" );
+		Optional<ButtonType> result = alert.showAndWait();
+		if( result.get() == ButtonType.YES )
+		{
+			try
+			{
+				Desktop.getDesktop().browse( new URL( GAME_OF_LIFE_WIKI_URL ).toURI() );
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+			catch(URISyntaxException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			// ... user chose NO or closed the dialog
+		}
 	}
 
 	private void menuSaveAsSelected()

@@ -24,8 +24,6 @@ public class App extends Application
 		instantiateModels();
 		GameOfLifeView gameOfLifeView = new GameOfLifeView();
 		Scene scene = new Scene( gameOfLifeView.getView() );
-		final String uri = getClass().getResource( "app.css" ).toExternalForm();
-		scene.getStylesheets().add( uri );
 
 		primaryStage.setMinWidth( 1200 );
 		primaryStage.setTitle( TITLE_GAME_OF_LIFE );
