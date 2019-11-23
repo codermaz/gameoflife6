@@ -28,6 +28,8 @@ public class App extends Application
 		primaryStage.setMinWidth( 1200 );
 		primaryStage.setTitle( TITLE_GAME_OF_LIFE );
 		primaryStage.setScene( scene );
+		final String uri = getClass().getResource( "app.css" ).toExternalForm();
+		scene.getStylesheets().add( uri );
 
 		primaryStage.show();
 
@@ -37,5 +39,11 @@ public class App extends Application
 	{
 		Injector.instantiateModelOrService( GameOfLifeModel.class );
 		Injector.instantiateModelOrService( SaveBoardModel.class );
+	}
+
+	@Override
+	public void stop() throws Exception
+	{
+		Injector.forgetAll();
 	}
 }
