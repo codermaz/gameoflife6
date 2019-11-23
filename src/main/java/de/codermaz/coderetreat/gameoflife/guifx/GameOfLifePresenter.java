@@ -4,6 +4,7 @@ import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
 import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
 import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardModel;
 import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardView;
+import de.codermaz.coderetreat.gameoflife.guifx.youtube.YoutubeView;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfo;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfoXml;
 import javafx.application.Platform;
@@ -84,6 +85,8 @@ public class GameOfLifePresenter
 	private MenuItem menuQuit;
 	@FXML
 	private MenuItem menuInfo;
+	@FXML
+	private MenuItem menuInfoConway;
 
 	@FXML
 	private BarChart<Integer, Integer> aliveCellsBarChart;
@@ -171,6 +174,22 @@ public class GameOfLifePresenter
 		gameOfLifeModel.setFileMenu( fileMenu );
 
 		menuInfo.setOnAction( event -> menuHelpSelected() );
+		menuInfoConway.setOnAction( event -> menuInfoConwaySelected() );
+
+	}
+
+	private void menuInfoConwaySelected()
+	{
+		YoutubeView youtubeView = new YoutubeView();
+		Scene youtubeScene = new Scene( youtubeView.getView() );
+		Stage primaryStage = (Stage)mainVBox.getScene().getWindow();
+		gameOfLifeModel.primaryStageProperty().set( primaryStage );
+		gameOfLifeModel.returnSceneProperty().set( primaryStage.getScene() );
+		primaryStage.setTitle( TITLE_GAME_OF_LIFE + " - Does John Conway hate his Game of Life?" );
+		primaryStage.setScene( youtubeScene );
+		//		primaryStage.setMaximized( true );
+		primaryStage.setFullScreen( true );
+		primaryStage.show();
 
 	}
 
