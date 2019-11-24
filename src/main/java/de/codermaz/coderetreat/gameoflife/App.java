@@ -3,10 +3,15 @@ package de.codermaz.coderetreat.gameoflife;
 import com.airhacks.afterburner.injection.Injector;
 import de.codermaz.coderetreat.gameoflife.guifx.GameOfLifeModel;
 import de.codermaz.coderetreat.gameoflife.guifx.GameOfLifeView;
+import de.codermaz.coderetreat.gameoflife.guifx.configuration.ConfigurationModel;
 import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardModel;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class App extends Application
@@ -21,6 +26,7 @@ public class App extends Application
 	@Override
 	public void start(Stage primaryStage)
 	{
+		injectCustomProperties(); // experimental
 		instantiateModels();
 		GameOfLifeView gameOfLifeView = new GameOfLifeView();
 		Scene scene = new Scene( gameOfLifeView.getView() );
@@ -37,8 +43,17 @@ public class App extends Application
 
 	public void instantiateModels()
 	{
+		Injector.instantiateModelOrService( ConfigurationModel.class );
 		Injector.instantiateModelOrService( GameOfLifeModel.class );
 		Injector.instantiateModelOrService( SaveBoardModel.class );
+	}
+
+	public void injectCustomProperties()
+	{
+		LocalDate date = LocalDate.of( 2019, Month.NOVEMBER, 23 );
+		Map<Object, Object> customProperties = new HashMap<>();
+		customProperties.put( "experimentalDate", date ); // injected in GameOfLifePresenter
+		Injector.setConfigurationSource( customProperties::get );
 	}
 
 	@Override

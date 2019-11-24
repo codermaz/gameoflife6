@@ -2,6 +2,7 @@ package de.codermaz.coderetreat.gameoflife.guifx;
 
 import de.codermaz.coderetreat.gameoflife.gamelogic.GameField;
 import de.codermaz.coderetreat.gameoflife.gamelogic.Generation;
+import de.codermaz.coderetreat.gameoflife.guifx.configuration.ConfigurationModel;
 import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardModel;
 import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardView;
 import de.codermaz.coderetreat.gameoflife.guifx.youtube.YoutubeView;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Deque;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,11 +59,14 @@ import static de.codermaz.coderetreat.gameoflife.App.TITLE_GAME_OF_LIFE;
 
 public class GameOfLifePresenter
 {
-
 	@Inject
-	GameOfLifeModel gameOfLifeModel;
+	ConfigurationModel configurationModel;
 	@Inject
-	SaveBoardModel  saveBoardModel;
+	LocalDate          experimentalDate;
+	@Inject
+	GameOfLifeModel    gameOfLifeModel;
+	@Inject
+	SaveBoardModel     saveBoardModel;
 
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
@@ -123,6 +128,7 @@ public class GameOfLifePresenter
 	{
 		handleExecuterService();
 		handleFileMenu();
+		lookForStartXmlFile();
 		prepareBoardBindings();
 
 		startGame();
@@ -140,6 +146,18 @@ public class GameOfLifePresenter
 				startGame();
 			}
 		} );
+	}
+
+	private void lookForStartXmlFile()
+	{
+		File startBoardXmlFile = new File( configurationModel.getStartBoardXml() );
+		if( startBoardXmlFile.exists() )
+		{
+			updateBoardWithXmlFile( startBoardXmlFile );
+			System.out.println(
+				"start board is set according to board xml file: " + configurationModel.getStartBoardXml() + ", experimental date info: "
+					+ experimentalDate );
+		}
 	}
 
 	private void startGame()
@@ -169,7 +187,7 @@ public class GameOfLifePresenter
 			ObservableList<? extends MenuItem> openRecentMenuItems = c.getList();
 			openRecentMenuItems.forEach( menuItem -> //
 				menuItem.setOnAction( event -> //
-					updateBoardAfterFileSelected( new File( menuItem.getText() ) ) ) );
+					updateBoardWithXmlFile( new File( menuItem.getText() ) ) ) );
 		} );
 		gameOfLifeModel.setFileMenu( fileMenu );
 
@@ -251,28 +269,31 @@ public class GameOfLifePresenter
 		File fileChosen = fileChooser.showOpenDialog( (boardGrid).getScene().getWindow() );
 		if( fileChosen == null )
 			return;
-		updateBoardAfterFileSelected( fileChosen );
+		updateBoardWithXmlFile( fileChosen );
 	}
 
-	private void updateBoardAfterFileSelected(File fileChosen)
+	private void updateBoardWithXmlFile(File fileChosen)
 	{
 		BoardInfo boardInfo = new BoardInfo();
 		Optional<BoardInfoXml> boardInfoXml = boardInfo.jaxbXmlFileToObject( fileChosen.toString() );
 		if( boardInfoXml.isPresent() )
 		{
 			saveBoardModel.addToRecentFiles( fileChosen );
+			saveBoardModel.lastChosenFileProperty().set( fileChosen );
 			Deque<File> recentOpenedFiles = saveBoardModel.getRecentOpenedFiles();
 			gameOfLifeModel.prepareSubMenu( recentOpenedFiles );
-			Stage stage = (Stage)mainVBox.getScene().getWindow();
-			stage.setTitle( TITLE_GAME_OF_LIFE + " - " + boardInfoXml.get().getName() + " - " + fileChosen.getAbsolutePath() );
-			saveBoardModel.lastChosenFileProperty().set( fileChosen );
+			if( mainVBox.getScene() != null )
+			{
+				Stage stage = (Stage)mainVBox.getScene().getWindow();
+				stage.setTitle( TITLE_GAME_OF_LIFE + " - " + boardInfoXml.get().getName() + " - " + fileChosen.getAbsolutePath() );
+			}
 
 			int[][] newBoard = boardInfo.transferBoardXmlToGameBoard( boardInfoXml.get() );
 
 			cleanBoardGrid();
+			gameOfLifeModel.gameBoardProperty().set( newBoard );
 			gameOfLifeModel.yearsGoneProperty().set( 0 );
 			aliveCellsBarChart.getData().clear();
-			gameOfLifeModel.gameBoardProperty().set( newBoard );
 		}
 		else
 		{
