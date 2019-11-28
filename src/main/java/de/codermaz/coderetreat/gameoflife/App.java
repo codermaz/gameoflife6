@@ -5,6 +5,7 @@ import de.codermaz.coderetreat.gameoflife.guifx.GameOfLifeModel;
 import de.codermaz.coderetreat.gameoflife.guifx.GameOfLifeView;
 import de.codermaz.coderetreat.gameoflife.guifx.configuration.ConfigurationModel;
 import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardModel;
+import de.codermaz.coderetreat.gameoflife.services.watchdir.GoLWatchService;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -46,6 +47,7 @@ public class App extends Application
 		Injector.instantiateModelOrService( ConfigurationModel.class );
 		Injector.instantiateModelOrService( GameOfLifeModel.class );
 		Injector.instantiateModelOrService( SaveBoardModel.class );
+		Injector.instantiateModelOrService( GoLWatchService.class );
 	}
 
 	public void injectCustomProperties()

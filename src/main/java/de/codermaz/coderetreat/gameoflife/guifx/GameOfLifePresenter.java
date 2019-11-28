@@ -8,6 +8,7 @@ import de.codermaz.coderetreat.gameoflife.guifx.saveboard.SaveBoardView;
 import de.codermaz.coderetreat.gameoflife.guifx.youtube.YoutubeView;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfo;
 import de.codermaz.coderetreat.gameoflife.model.BoardInfoXml;
+import de.codermaz.coderetreat.gameoflife.services.watchdir.GoLWatchService;
 import javafx.application.Platform;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.ListChangeListener;
@@ -49,6 +50,7 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -63,10 +65,13 @@ public class GameOfLifePresenter
 	ConfigurationModel configurationModel;
 	@Inject
 	LocalDate          experimentalDate;
+
 	@Inject
-	GameOfLifeModel    gameOfLifeModel;
+	GameOfLifeModel gameOfLifeModel;
 	@Inject
-	SaveBoardModel     saveBoardModel;
+	SaveBoardModel  saveBoardModel;
+	@Inject
+	GoLWatchService goLWatchService;
 
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
@@ -131,7 +136,27 @@ public class GameOfLifePresenter
 		lookForStartXmlFile();
 		prepareBoardBindings();
 
+		handleWatchServiceDirectoryWithSubDirs();
+
 		startGame();
+	}
+
+	private void handleWatchServiceDirectoryWithSubDirs()
+	{
+		if( goLWatchService.startMonitoringWithSubDirs() )
+		{
+			CompletableFuture.supplyAsync( GoLWatchService::getAddedXmlFileUnderWatchedDir ).thenAccept( stringPathPair -> {
+				stringPathPair.ifPresent( dirFilePair -> {
+					System.out.println( "dir  -----> " + dirFilePair.getKey() );
+					System.out.println( "file -----> " + dirFilePair.getValue() );
+				} );
+			} );
+		}
+	}
+
+	private void handleWatchServiceDirectory()
+	{
+		goLWatchService.startMonitoringOnlyRootDir();
 	}
 
 	private void prepareBoardBindings()
@@ -253,7 +278,6 @@ public class GameOfLifePresenter
 		Stage primaryStage = (Stage)mainVBox.getScene().getWindow();
 		gameOfLifeModel.primaryStageProperty().set( primaryStage );
 		gameOfLifeModel.returnSceneProperty().set( primaryStage.getScene() );
-		primaryStage.setMinWidth( 1200 );
 		File lastChosenBoardXmlFile = saveBoardModel.lastChosenFileProperty().get();
 		String fileName = lastChosenBoardXmlFile == null ? " " : " " + lastChosenBoardXmlFile.getAbsolutePath() + " ";
 		primaryStage.setTitle( TITLE_GAME_OF_LIFE + fileName + "- Save board" );
