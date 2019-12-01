@@ -1,7 +1,8 @@
 package de.codermaz.coderetreat.gameoflife.services.watchdir;
 
 import de.codermaz.coderetreat.gameoflife.guifx.configuration.ConfigurationModel;
-import javafx.util.Pair;
+import javafx.beans.Observable;
+import javafx.beans.property.SimpleObjectProperty;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
@@ -9,14 +10,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
-import java.util.Optional;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -25,21 +24,39 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class GoLWatchService
 {
-	private static WatchService            watchService;
-	private static HashMap<WatchKey, Path> keys;
-	private static Path                    watchDir;
 	@Inject
-	private        ConfigurationModel      configurationModel;
+	private ConfigurationModel configurationModel;
 
-	public static Optional<Pair<String, Path>> getAddedXmlFileUnderWatchedDir()
+	private WatchService               watchService;
+	private HashMap<WatchKey, Path>    keys;
+	private SimpleObjectProperty<Path> watchDir = new SimpleObjectProperty<>();
+
+	@PostConstruct
+	public void init()
 	{
-		return processEventsWithinSubDirs();
+		try
+		{
+			watchService = FileSystems.getDefault().newWatchService();
+			keys = new HashMap<>();
+			watchDir.addListener( this::monitorAndFetchXmlFiles );
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private void monitorAndFetchXmlFiles(Observable observable)
+	{
+		keys.clear();
+		startMonitoringWithSubDirs();
+		processEventsWithinSubDirs();
 	}
 
 	/**
 	 * Register the given directory with the WatchService; This function will be called by FileVisitor
 	 */
-	private static void registerDirectory(Path dir) throws IOException
+	private void registerDirectory(Path dir) throws IOException
 	{
 		WatchKey key = dir.register( watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY );
 		keys.put( key, dir );
@@ -48,7 +65,7 @@ public class GoLWatchService
 	/**
 	 * Register the given directory, and all its sub-directories, with the WatchService.
 	 */
-	private static void walkAndRegisterDirectories(final Path start) throws IOException
+	private void walkAndRegisterDirectories(final Path start) throws IOException
 	{
 		// register directory and sub-directories
 		Files.walkFileTree( start, new SimpleFileVisitor<Path>()
@@ -64,10 +81,8 @@ public class GoLWatchService
 
 	/**
 	 * Process all events for keys queued to the watcher
-	 *
-	 * @return
 	 */
-	private static Optional<Pair<String, Path>> processEventsWithinSubDirs()
+	private void processEventsWithinSubDirs()
 	{
 		for(; ; )
 		{
@@ -79,7 +94,8 @@ public class GoLWatchService
 			}
 			catch(InterruptedException x)
 			{
-				return null;
+				System.err.println( "thread is interrupted: " + x.getMessage() );
+				return;
 			}
 
 			Path dir = keys.get( key );
@@ -113,16 +129,16 @@ public class GoLWatchService
 						}
 						else
 						{
-							//							System.out.println( "watchDir.toString() = " + watchDir.toString() ); // C:\Temp\GoL\boards\col\watch
-							//							System.out.println(
-							//								"child.getParent().toString() = " + child.getParent().toString() ); // C:\Temp\GoL\boards\col\watch\a1\a11
-							//							System.out.println( "name.toString() = " + name.toString() ); // a - Kopie (4).xml
-							if( child.getParent().toString().length() != watchDir.toString().length() )
+							// System.out.println( "watchDir.toString() = " + watchDir.toString() ); // C:\Temp\GoL\boards\col\watch
+							// System.out.println(
+							//   "child.getParent().toString() = " + child.getParent().toString() ); // C:\Temp\GoL\boards\col\watch\a1\a11
+							//	System.out.println( "name.toString() = " + name.toString() ); // a - Kopie (4).xml
+							if( child.getParent().toString().length() != watchDir.get().toString().length() )
 							{
-								String relativeDir = child.getParent().toString().substring( watchDir.toString().length() + 1 );
-								//								System.out.println( "relativeDir = " + relativeDir ); // a1\a11
-								return Optional.of( new Pair<>( relativeDir, name ) );
+								String relativeDir = child.getParent().toString().substring( watchDir.get().toString().length() + 1 );
+								System.out.println( "relativeDir = " + relativeDir ); // a1\a11
 							}
+							System.out.println( child.getParent().resolve( name ) );
 						}
 					}
 					catch(IOException x)
@@ -145,42 +161,13 @@ public class GoLWatchService
 				}
 			}
 		}
-		return Optional.empty();
-	}
-
-	@PostConstruct
-	public void init()
-	{
-		try
-		{
-			watchService = FileSystems.getDefault().newWatchService();
-			keys = new HashMap<>();
-			watchDir = Paths.get( configurationModel.getWatchDir() );
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public void startMonitoringOnlyRootDir()
-	{
-		try
-		{
-			registerDirectory( watchDir );
-			processEventsOnlyForRootDir();
-		}
-		catch(InterruptedException | IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	public boolean startMonitoringWithSubDirs()
 	{
 		try
 		{
-			walkAndRegisterDirectories( watchDir );
+			walkAndRegisterDirectories( watchDir.get() );
 			return true;
 		}
 		catch(IOException e)
@@ -188,6 +175,19 @@ public class GoLWatchService
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public void startMonitoringOnlyRootDir()
+	{
+		try
+		{
+			registerDirectory( watchDir.get() );
+			processEventsOnlyForRootDir();
+		}
+		catch(InterruptedException | IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	private void processEventsOnlyForRootDir() throws InterruptedException
@@ -203,13 +203,8 @@ public class GoLWatchService
 		}
 	}
 
-	public Path getWatchDir()
+	public SimpleObjectProperty<Path> watchDirProperty()
 	{
 		return watchDir;
-	}
-
-	public void setWatchDir(Path watchDir)
-	{
-		GoLWatchService.watchDir = watchDir;
 	}
 }

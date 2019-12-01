@@ -45,6 +45,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Deque;
 import java.util.Objects;
@@ -143,17 +145,13 @@ public class GameOfLifePresenter
 
 	private void handleWatchServiceDirectoryWithSubDirs()
 	{
-		if( goLWatchService.startMonitoringWithSubDirs() )
-		{
-			CompletableFuture.supplyAsync( GoLWatchService::getAddedXmlFileUnderWatchedDir ).thenAccept( stringPathPair -> {
-				stringPathPair.ifPresent( dirFilePair -> {
-					System.out.println( "dir  -----> " + dirFilePair.getKey() );
-					System.out.println( "file -----> " + dirFilePair.getValue() );
-				} );
-			} );
-		}
+		CompletableFuture.runAsync( () -> {
+			Path watchDirPath = Paths.get( configurationModel.getWatchDir() );
+			goLWatchService.watchDirProperty().set( watchDirPath );
+		} );
 	}
 
+	// not deleted, if this alternative is needed
 	private void handleWatchServiceDirectory()
 	{
 		goLWatchService.startMonitoringOnlyRootDir();
